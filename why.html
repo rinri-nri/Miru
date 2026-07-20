@@ -75,8 +75,15 @@
       radial-gradient(ellipse 72% 38% at 88% 8%,rgba(81,112,221,.18),transparent 70%),
       radial-gradient(ellipse 70% 32% at 14% 98%,rgba(224,138,62,.22),transparent 70%),
       linear-gradient(180deg,#0b1322 0%,#0e1e45 26%,#132d4d 52%,#262018 77%,#49300f 100%)}
-    .page::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.5;background-image:
-      radial-gradient(circle at 12% 18%,#fff 0 1px,transparent 1.6px),radial-gradient(circle at 75% 10%,#e8c987 0 1px,transparent 1.7px),radial-gradient(circle at 58% 62%,#fff 0 .8px,transparent 1.4px),radial-gradient(circle at 92% 54%,#fff 0 .8px,transparent 1.4px);background-size:210px 190px,270px 240px,180px 230px,320px 290px}
+    .page::before{display:none}
+    .ambient-bg{position:fixed;inset:0;z-index:0;pointer-events:none}
+    .page > *:not(.ambient-bg){position:relative;z-index:1}
+    #trailCanvas{position:absolute;inset:0;width:100%;height:100%;opacity:.55}
+    .stars{position:absolute;inset:-20% -10% -10% -10%}
+    .stars i{position:absolute;display:block;width:2px;height:2px;border-radius:50%;background:#fff}
+    .stars i.gold{background:var(--gold)}
+    .stars i.spark{width:auto!important;height:auto!important;background:none;border-radius:0;font-size:10px;line-height:1;color:#fff;text-shadow:0 0 4px rgba(130,150,240,.5)}
+    .stars i.spark.gold{background:none;color:var(--gold);text-shadow:0 0 5px rgba(232,201,135,.5)}
     .inner{width:min(100% - 40px,760px);margin-inline:auto}
     .hero{min-height:max(590px,72vh);display:grid;place-items:center;padding:112px 0 84px;text-align:center}
     .hero-content{max-width:680px}
@@ -204,6 +211,10 @@
   </div>
 
   <main class="page">
+    <div class="ambient-bg" aria-hidden="true">
+      <canvas id="trailCanvas"></canvas>
+      <div class="stars" id="stars"></div>
+    </div>
     <section class="hero inner" id="top">
       <div class="hero-content">
         <div class="app-icon" aria-label="Miruアプリアイコン">
@@ -362,6 +373,66 @@
       openButton.addEventListener('click',function(){menu.classList.contains('open')?closeMenu():openMenu()});
       menu.querySelectorAll('[data-menu-close],a').forEach(function(element){element.addEventListener('click',closeMenu)});
       addEventListener('keydown',function(event){if(event.key==='Escape')closeMenu()});
+    })();
+
+    /* トップページと共通の同心円スタートレイル。負荷を抑え、非表示タブでは停止する。 */
+    (function(){
+      var c=document.getElementById('trailCanvas');
+      var reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+      var dpr=Math.min(devicePixelRatio||1,1.5);
+      function size(){c.width=innerWidth*dpr;c.height=innerHeight*dpr}
+      size();addEventListener('resize',size);
+      var ctx=c.getContext('2d');
+      var N=130;
+      var stars=Array.from({length:N},function(){
+        var r=Math.pow(Math.random(),.7);
+        return {rad:.05+r*1.15,ang:Math.random()*Math.PI*2,size:Math.random()*1.4+.5,bright:Math.random()*.6+.3,gold:Math.random()<.16};
+      });
+      var SPEED=.00005,raf=null;
+      function frame(ts){
+        var w=c.width,h=c.height,px=.86*w,py=.10*h,base=Math.max(w,h);
+        ctx.clearRect(0,0,w,h);
+        for(var i=0;i<stars.length;i++){
+          var s=stars[i],a=s.ang+(reduced?0:ts*SPEED),R=s.rad*base;
+          var x=px+Math.cos(a)*R,y=py+Math.sin(a)*R;
+          var sweep=.28+s.bright*.62,segs=10,lw=s.size*2.4*dpr*.6,baseCol=s.gold?'232,201,135':'205,214,255';
+          for(var k=0;k<segs;k++){
+            var t0=k/segs,t1=(k+1)/segs,a0=a-sweep*t1,a1=a-sweep*t0,fade=Math.pow(1-t1,1.6);
+            ctx.beginPath();ctx.arc(px,py,R,a0,a1);ctx.strokeStyle='rgba('+baseCol+','+(fade*.22)+')';ctx.lineWidth=lw;ctx.stroke();
+          }
+          ctx.globalAlpha=s.bright*.85;ctx.fillStyle=s.gold?'#e8c987':'#dfe6ff';ctx.beginPath();ctx.arc(x,y,s.size*dpr*.65,0,7);ctx.fill();ctx.globalAlpha=1;
+        }
+        if(!reduced)raf=requestAnimationFrame(frame);
+      }
+      function start(){if(raf==null)raf=requestAnimationFrame(frame)}
+      function stop(){if(raf!=null){cancelAnimationFrame(raf);raf=null}}
+      document.addEventListener('visibilitychange',function(){if(document.hidden)stop();else start()});
+      start();
+    })();
+
+    /* トップページと共通のスクロール視差星粒子。 */
+    (function(){
+      var wrap=document.getElementById('stars');
+      var reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+      var layers=[{n:22,speed:.05,size:1.4,op:.35},{n:18,speed:.12,size:1.8,op:.5},{n:10,speed:.22,size:2.4,op:.65,gold:true}];
+      var items=[];
+      layers.forEach(function(l){
+        for(var i=0;i<l.n;i++){
+          var el=document.createElement('i'),gold=l.gold&&Math.random()<.5;
+          if(gold)el.className='gold';
+          var w=l.size,left=Math.random()*100,top=Math.random()*140-20;
+          el.style.left=left+'%';el.style.top=top+'%';el.style.width=w+'px';el.style.height=w+'px';el.style.opacity=l.op;
+          wrap.appendChild(el);items.push({el:el,speed:l.speed,baseTop:top,gold:gold,size:l.size});
+        }
+      });
+      var sparkCount=Math.min(20,items.length),pool=items.slice();
+      for(var s=0;s<sparkCount;s++){
+        var idx=Math.floor(Math.random()*pool.length),it=pool.splice(idx,1)[0];
+        it.el.classList.add('spark');it.el.textContent='✦';it.el.style.fontSize=(it.size*7)+'px';
+      }
+      if(reduced)return;
+      function onScroll(){var y=window.scrollY;for(var i=0;i<items.length;i++)items[i].el.style.transform='translateY('+(-y*items[i].speed)+'px)'}
+      addEventListener('scroll',onScroll,{passive:true});onScroll();
     })();
   </script>
 </body>
