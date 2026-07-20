@@ -53,6 +53,7 @@ body.loading{ overflow:hidden; }
 .site-loader::after{ content:""; position:absolute; inset:0; background:radial-gradient(ellipse at 78% 7%,rgba(109,140,245,.22),transparent 34%); }
 .loader-stars,.loader-content{ position:relative; z-index:1; }.loader-stars i{ position:absolute; display:block; color:#f7f8ff; font-style:normal; text-shadow:0 0 12px rgba(205,220,255,.75); animation:loaderTwinkle 1.8s ease-in-out infinite alternate; }.loader-stars i:nth-child(1){ top:-23vh; left:-18vw; font-size:11px; }.loader-stars i:nth-child(2){ top:-16vh; right:-20vw; font-size:17px; animation-delay:-.7s; }.loader-stars i:nth-child(3){ top:12vh; left:-25vw; font-size:8px; animation-delay:-1.2s; }.loader-stars i:nth-child(4){ top:18vh; right:-24vw; font-size:12px; color:var(--gold); animation-delay:-.35s; }
 .loader-content{ width:min(270px,70vw); text-align:center; transform:translateY(-1vh); }.loader-logo{ display:inline-block; color:#fff; font-family:"Zen Antique Logo","Hiragino Mincho ProN","Yu Mincho",serif; font-size:clamp(3rem,8vw,4.35rem); letter-spacing:-.09em; text-shadow:0 6px 34px rgba(0,0,0,.26); }.loader-logo .u{ position:relative; }.loader-logo .spk{ position:absolute; width:.38em; height:.38em; top:.25em; right:-.1em; filter:drop-shadow(0 0 9px rgba(232,201,135,.7)); }.loader-caption{ margin:17px 0 18px; color:rgba(239,242,250,.72); font-family:"Zen Antique Logo","Zen Antique",serif; font-size:.62rem; letter-spacing:.13em; }.loader-progress{ height:2px; overflow:hidden; background:rgba(255,255,255,.25); box-shadow:0 0 20px rgba(232,201,135,.18); }.loader-progress span{ display:block; width:0; height:100%; background:linear-gradient(90deg,#9eb6ff,#f8d89d); box-shadow:0 0 10px rgba(255,229,174,.9); transition:width .16s linear; }.loader-percent{ margin:9px 0 0; color:rgba(250,241,221,.86); font-size:.68rem; letter-spacing:.12em; font-variant-numeric:tabular-nums; }
+.loader-caption{ font-family:"Zen Maru Gothic","Hiragino Maru Gothic ProN","Yu Gothic UI","Yu Gothic","Meiryo",sans-serif; font-size:.72rem; letter-spacing:.08em; }
 @keyframes loaderTwinkle{ from{ opacity:.25; transform:scale(.72) rotate(0deg); } to{ opacity:1; transform:scale(1.1) rotate(18deg); } }
 @media (prefers-reduced-motion: reduce),(hover:none),(pointer:coarse){ .loader-stars i{ animation:none; }.site-loader{ transition:none; } }
 
@@ -278,7 +279,7 @@ footer .copy{ width:100%; font-size:.7rem; color:#586074; margin-top:8px; }
   <div class="loader-content">
     <div class="loader-stars" aria-hidden="true"><i>✦</i><i>✦</i><i>·</i><i>✦</i></div>
     <div class="loader-logo">Mir<span class="u">u<svg class="spk" viewBox="0 0 100 100" aria-hidden="true"><defs><linearGradient id="LGloader" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6d8cf5"/><stop offset="1" stop-color="#f0a75a"/></linearGradient></defs><path d="M50 2 C56 36 64 44 98 50 C64 56 56 64 50 98 C44 64 36 56 2 50 C36 44 44 36 50 2 Z" fill="url(#LGloader)"/></svg></span></div>
-    <p class="loader-caption">THINK FREELY. SEE CLEARLY.</p>
+    <p class="loader-caption">考えを、見えるかたちに。</p>
     <div class="loader-progress" aria-hidden="true"><span id="loaderProgress"></span></div>
     <p class="loader-percent" id="loaderPercent">0%</p>
   </div>
