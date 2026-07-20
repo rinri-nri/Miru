@@ -258,7 +258,7 @@ body.evidence-draft .flow > .section:not(.evidence-library){display:none}
 .evidence-group:nth-of-type(2) .evidence-item:nth-of-type(1)::before{content:"疑問・反論"}.evidence-group:nth-of-type(2) .evidence-item:nth-of-type(2)::before{content:"日次分析・週次分析"}.evidence-group:nth-of-type(2) .evidence-item:nth-of-type(3)::before{content:"多ビュー・AI対話"}
 .evidence-group:nth-of-type(3) .evidence-item:nth-of-type(1)::before{content:"自然音"}.evidence-group:nth-of-type(3) .evidence-item:nth-of-type(2)::before{content:"ポモドーロタイマー"}.evidence-group:nth-of-type(3) .evidence-item:nth-of-type(3)::before{content:"クイックメモ"}
 .evidence-group:nth-of-type(4) .evidence-item:nth-of-type(1)::before,.evidence-group:nth-of-type(4) .evidence-item:nth-of-type(2)::before{content:"統計情報カード・実績"}
-.evidence-item p{margin:0}.evidence-citation{color:#e5e8ef;font-size:.93rem;line-height:1.9}.evidence-summary{margin-top:9px!important;color:var(--muted);font-size:.86rem;line-height:1.9}
+.evidence-item p{margin:0}.evidence-citation{color:#e5e8ef;font-size:.93rem;line-height:1.9}.evidence-summary{margin-top:12px!important;color:var(--muted);font-size:.86rem;line-height:1.95}.evidence-key{display:block;margin-bottom:9px;color:#dbe3f4;font-weight:700;line-height:1.85}
 .evidence-item a{color:var(--gold);text-decoration:none}.evidence-item a:hover{text-decoration:underline}
 </style>
 </head>
@@ -692,6 +692,15 @@ body.evidence-draft .flow > .section:not(.evidence-library){display:none}
   addEventListener('scroll', onScroll, {passive:true});
   onScroll();
 })();
+</script>
+<script>
+  /* 長い説明は結論を先に見せ、補足を次の行へ分ける。 */
+  document.querySelectorAll('.evidence-summary').forEach(function(summary){
+    var text=summary.textContent.trim(), cut=text.indexOf('。')+1;
+    if(cut<=0 || cut>=text.length)return;
+    var key=document.createElement('span');key.className='evidence-key';key.textContent=text.slice(0,cut);
+    summary.replaceChildren(key,document.createTextNode(text.slice(cut)));
+  });
 </script>
 </body>
 </html>
