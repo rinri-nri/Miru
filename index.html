@@ -60,9 +60,8 @@ a{ color:inherit; }
   padding:8px clamp(20px,5vw,64px);
   background:rgba(12,16,32,.56); border-bottom:1px solid rgba(255,255,255,.06);
   backdrop-filter:blur(18px) saturate(1.3); -webkit-backdrop-filter:blur(18px) saturate(1.3);
-  transform:translateY(-110%); opacity:0;
-  transition:transform .38s cubic-bezier(.4,0,.2,1), opacity .38s ease; }
-.topbar.show{ transform:translateY(0); opacity:1; }
+  opacity:0; pointer-events:none; transition:opacity .38s ease; }
+.topbar.show{ opacity:1; pointer-events:auto; }
 .topbar .logo{ font-size:1.575rem; color:#fff; }
 .topbar .links{ display:flex; align-items:center; gap:clamp(14px,2vw,30px); }
 .topbar .links a{ font-size:.8rem; color:#dfe3ee; text-decoration:none; opacity:.85; transition:opacity .2s; }
