@@ -67,12 +67,10 @@ a{ color:inherit; }
 .topbar .links a{ font-size:.8rem; color:#dfe3ee; text-decoration:none; opacity:.85; transition:opacity .2s; }
 .topbar .links a:hover{ opacity:1; }
 .spark-menu{ display:grid; place-items:center; width:42px; height:42px; margin-left:2px; padding:0;
-  border:1px solid rgba(255,255,255,.3); border-radius:50%; color:#fff; cursor:pointer;
-  background:radial-gradient(circle at 32% 25%,rgba(255,255,255,.34),rgba(97,122,215,.34) 42%,rgba(222,138,62,.5));
-  box-shadow:0 4px 18px rgba(0,0,0,.28), inset 0 1px 1px rgba(255,255,255,.26); transition:transform .25s ease, box-shadow .25s ease; }
-.spark-menu:hover{ transform:rotate(12deg) scale(1.07); box-shadow:0 5px 24px rgba(117,139,243,.44), inset 0 1px 1px rgba(255,255,255,.3); }
+  border:0; color:#fff; cursor:pointer; background:transparent; transition:transform .25s ease; }
+.spark-menu:hover{ transform:rotate(12deg) scale(1.12); }
 .spark-menu:focus-visible{ outline:2px solid var(--gold); outline-offset:3px; }
-.spark-menu svg{ width:22px; height:22px; filter:drop-shadow(0 0 4px rgba(255,255,255,.8)); }
+.spark-menu svg{ width:25px; height:25px; filter:drop-shadow(0 0 5px rgba(255,255,255,.82)); }
 .menu-layer{ position:fixed; inset:0; z-index:30; display:flex; justify-content:flex-end; pointer-events:none; opacity:0; transition:opacity .28s ease; }
 .menu-layer.open{ pointer-events:auto; opacity:1; }
 .menu-scrim{ position:absolute; inset:0; background:rgba(4,8,18,.5); backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px); }
