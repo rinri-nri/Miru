@@ -90,7 +90,7 @@ a{ color:inherit; }
 .menu-layer.closing .menu-panel{ opacity:0; transition-delay:0s; }
 .menu-top{ display:flex; align-items:center; justify-content:space-between; margin-bottom:40px; }
 .menu-title{ margin:0; font-family:inherit; font-size:1.3rem; font-weight:700; letter-spacing:.04em; }
-.menu-close{ display:grid; place-items:center; width:38px; height:38px; padding:0; border:0; color:#eef1fb; background:transparent; cursor:pointer;
+.menu-close{ position:fixed; top:8px; right:clamp(20px,5vw,64px); z-index:1; display:grid; place-items:center; width:42px; height:42px; padding:0; border:0; color:#eef1fb; background:transparent; cursor:pointer;
   transition:transform .25s ease, filter .25s ease; }
 .menu-close svg{ width:25px; height:25px; filter:drop-shadow(0 0 4px rgba(255,255,255,.52)); }
 .menu-close path{ fill:none; stroke:currentColor; stroke-width:3.2; stroke-linecap:round; }
