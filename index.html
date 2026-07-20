@@ -103,6 +103,32 @@ a{ color:inherit; }
 .menu-group a:hover::after{ transform:translateX(4px); }
 body.menu-open{ overflow:hidden; }
 
+/* ── story / developer on the home page ── */
+.narrative{ max-width:880px; }
+.narrative-in{ display:grid; grid-template-columns:minmax(0,1fr) minmax(220px,.7fr); gap:clamp(30px,6vw,78px); align-items:end; }
+.narrative h2{ margin:0; color:var(--head); font-size:clamp(1.65rem,3.2vw,2.55rem); line-height:1.48; word-break:keep-all; line-break:strict; text-wrap:balance; }
+.narrative-copy{ color:#b9bfcd; font-size:.94rem; line-height:2.1; }
+.reader-link{ display:inline-flex; align-items:center; gap:8px; margin-top:22px; padding:0; border:0; color:var(--gold); background:transparent; font:inherit; font-size:.9rem; font-weight:700; cursor:pointer; }
+.reader-link::after{ content:"→"; transition:transform .2s ease; }
+.reader-link:hover::after{ transform:translateX(4px); }
+.reader-link:focus-visible{ outline:2px solid var(--gold); outline-offset:4px; }
+.reader-layer{ position:fixed; inset:0; z-index:40; display:flex; justify-content:center; pointer-events:none; opacity:0; transition:none; }
+.reader-layer.open, .reader-layer.closing{ opacity:1; }
+.reader-layer.open{ pointer-events:auto; }
+.reader-scrim{ position:absolute; inset:0; background:rgba(4,8,18,0); backdrop-filter:blur(0); -webkit-backdrop-filter:blur(0);
+  transition:background .38s ease, backdrop-filter .38s ease, -webkit-backdrop-filter .38s ease; }
+.reader-layer.open .reader-scrim{ background:rgba(4,8,18,.42); backdrop-filter:blur(18px) saturate(1.12); -webkit-backdrop-filter:blur(18px) saturate(1.12); }
+.reader-window{ position:relative; width:min(1080px,calc(100% - 40px)); height:calc(100% - 96px); margin:74px 0 22px; opacity:0; transition:opacity .28s ease; }
+.reader-layer.open .reader-window{ opacity:1; transition-delay:.12s; }
+.reader-layer.closing .reader-window{ opacity:0; transition-delay:0s; }
+.reader-frame{ display:block; width:100%; height:100%; border:1px solid rgba(255,255,255,.14); border-radius:20px; background:#0c1020; box-shadow:0 24px 64px rgba(0,0,0,.45); }
+.reader-close{ position:fixed; top:8px; right:clamp(20px,5vw,64px); z-index:1; display:grid; place-items:center; width:42px; height:42px; padding:0; border:0; color:#eef1fb; background:transparent; cursor:pointer; transition:transform .25s ease, filter .25s ease; }
+.reader-close svg{ width:25px; height:25px; filter:drop-shadow(0 0 4px rgba(255,255,255,.52)); }
+.reader-close path{ fill:none; stroke:currentColor; stroke-width:3.2; stroke-linecap:round; }
+.reader-close:hover{ transform:rotate(12deg) scale(1.12); filter:drop-shadow(0 0 8px rgba(240,167,90,.6)); }
+.reader-close:focus-visible{ outline:2px solid var(--gold); outline-offset:3px; }
+body.reader-open{ overflow:hidden; }
+
 .btn{ display:inline-block; padding:9px 20px; border-radius:999px; font-size:.8rem; font-weight:700;
   text-decoration:none; color:var(--gold-ink); background:var(--gold);
   box-shadow:0 4px 18px rgba(0,0,0,.35); white-space:nowrap; }
@@ -203,6 +229,7 @@ footer .copy{ width:100%; font-size:.7rem; color:#586074; margin-top:8px; }
 @media (max-width:900px){
   .grid4{ grid-template-columns:repeat(2,1fr); }
   .split{ grid-template-columns:1fr; }
+  .narrative-in{ grid-template-columns:1fr; gap:18px; }
   .topbar .links a:not(.btn){ display:none; }
   .topbar .links .btn{ display:none; }
 }
@@ -214,6 +241,8 @@ footer .copy{ width:100%; font-size:.7rem; color:#586074; margin-top:8px; }
   .hero h1, .close h2{ white-space:nowrap; font-size:clamp(1rem,5.2vw,1.3rem); letter-spacing:-.03em; }
   .about-h, .card h2{ font-size:clamp(1.12rem,5.4vw,1.35rem); }
   .cell h3{ font-size:1.02rem; }
+  .reader-window{ width:calc(100% - 24px); height:calc(100% - 88px); margin:66px 0 22px; }
+  .reader-frame{ border-radius:14px; }
   .grid4{ grid-template-columns:1fr; }
   .hero .hint{ display:none; }
 }
@@ -251,6 +280,7 @@ footer .copy{ width:100%; font-size:.7rem; color:#586074; margin-top:8px; }
         <p class="menu-label">このページ</p>
         <a href="#about">Miruとは</a>
         <a href="#story">ストーリー</a>
+        <a href="#developer">開発者について</a>
         <a href="#principles">設計原則</a>
         <a href="#why">なぜこの機能があるのか</a>
         <a href="#evidence">エビデンス</a>
@@ -264,6 +294,26 @@ footer .copy{ width:100%; font-size:.7rem; color:#586074; margin-top:8px; }
       </div>
     </nav>
   </aside>
+</div>
+
+<div class="reader-layer" id="storyReader" aria-hidden="true">
+  <div class="reader-scrim" data-reader-close></div>
+  <div class="reader-window" role="dialog" aria-modal="true" aria-label="ストーリー全文">
+    <iframe class="reader-frame" title="ストーリー全文" data-reader-source="story.html"></iframe>
+  </div>
+  <button class="reader-close" type="button" aria-label="ストーリーを閉じる" data-reader-close>
+    <svg viewBox="0 0 100 100" aria-hidden="true"><path d="M27 27 L44 44 M56 56 L73 73 M73 27 L56 44 M44 56 L27 73"/></svg>
+  </button>
+</div>
+
+<div class="reader-layer" id="developerReader" aria-hidden="true">
+  <div class="reader-scrim" data-reader-close></div>
+  <div class="reader-window" role="dialog" aria-modal="true" aria-label="開発者について全文">
+    <iframe class="reader-frame" title="開発者について全文" data-reader-source="developer.html"></iframe>
+  </div>
+  <button class="reader-close" type="button" aria-label="開発者についてを閉じる" data-reader-close>
+    <svg viewBox="0 0 100 100" aria-hidden="true"><path d="M27 27 L44 44 M56 56 L73 73 M73 27 L56 44 M44 56 L27 73"/></svg>
+  </button>
 </div>
 
 <div class="hero">
@@ -303,10 +353,22 @@ footer .copy{ width:100%; font-size:.7rem; color:#586074; margin-top:8px; }
 </section>
 
 <!-- 人間観 -->
-<section class="quote-wrap" id="story">
+<section class="quote-wrap" id="human-view">
   <div class="quote">
     <p class="eyebrow">STORY ── 人間観</p>
     <blockquote><span class="lead">人間は必ず間違う。</span>私が人間の知性に対して、唯一絶対信用できる事があるとすれば、それは「人間の思考は信用できない」という一点のみです。ならば、弱点を前提としたシステムを組めばいい。それが、このアプリの設計思想です。<cite>── ストーリー「人間観」より</cite></blockquote>
+  </div>
+</section>
+
+<!-- ストーリー -->
+<section class="section narrative" id="story">
+  <p class="eyebrow">STORY</p>
+  <div class="narrative-in">
+    <h2>人間観から、ビジョンまで。<br>Miruは一本の線でつながっている。</h2>
+    <div class="narrative-copy">
+      <p>人間は必ず間違う。だからこそ、考えを外に出し、別の見方で確かめ、根拠を持って育てていく。Miruがマインドマップである理由と、目指している未来を綴りました。</p>
+      <button class="reader-link" type="button" data-reader-open="story">ストーリーを詳しく読む</button>
+    </div>
   </div>
 </section>
 
@@ -318,6 +380,18 @@ footer .copy{ width:100%; font-size:.7rem; color:#586074; margin-top:8px; }
     <div class="cell"><div class="n">02</div><h3>別の見方で観る。</h3><p>ひとつのマップを、行列表・アウトライン・カンバン・グラフで。表現が変わると、抜け漏れが浮かび上がります。</p></div>
     <div class="cell"><div class="n">03</div><h3>盲点を突かれる。<span class="tag">AI</span></h3><p>AIは答えを出す道具ではなく、あなたの思考の脆弱性を発見する道具。盲点や、思いつき得ない視点をくれる家臣です。</p></div>
     <div class="cell"><div class="n">04</div><h3>忘れる前提で、覚える。</h3><p>アクティブリコールと間隔復習。認知科学で実証され続けてきた学習法を、マップの上でそのまま。</p></div>
+  </div>
+</section>
+
+<!-- 開発者について -->
+<section class="section narrative" id="developer">
+  <p class="eyebrow">DEVELOPER</p>
+  <div class="narrative-in">
+    <h2>「人間とは何か」を、<br>ずっと考えてきた。</h2>
+    <div class="narrative-copy">
+      <p>Miruを作ったのは、どんな人間なのか。何を問い、何を読み、何を子どもたちに教えてきたのか。このアプリの根っこにある、個人的な話です。</p>
+      <button class="reader-link" type="button" data-reader-open="developer">開発者について詳しく読む</button>
+    </div>
   </div>
 </section>
 
@@ -355,7 +429,7 @@ footer .copy{ width:100%; font-size:.7rem; color:#586074; margin-top:8px; }
     <div class="logo">Miru</div>
     <nav class="f">
       <a href="#story">ストーリー</a>
-      <a href="#" onclick="return false">開発者について</a>
+      <a href="#developer">開発者について</a>
       <a href="#why">なぜこの機能</a>
       <a href="#evidence">エビデンス</a>
       <a href="#" onclick="return false">機能紹介</a>
@@ -423,6 +497,42 @@ footer .copy{ width:100%; font-size:.7rem; color:#586074; margin-top:8px; }
   for(var i=0;i<closeButtons.length;i++) closeButtons[i].addEventListener('click', closeMenu);
   for(var j=0;j<menuLinks.length;j++) menuLinks[j].addEventListener('click', closeMenu);
   addEventListener('keydown', function(event){ if(event.key === 'Escape') closeMenu(); });
+})();
+
+(function(){
+  var readers = document.querySelectorAll('.reader-layer');
+  var triggers = document.querySelectorAll('[data-reader-open]');
+  var activeReader = null;
+  var closeTimer;
+  function closeReader(){
+    if(!activeReader || !activeReader.classList.contains('open')) return;
+    var reader = activeReader;
+    reader.classList.remove('open');
+    reader.classList.add('closing');
+    reader.setAttribute('aria-hidden','true');
+    document.body.classList.remove('reader-open');
+    activeReader = null;
+    clearTimeout(closeTimer);
+    closeTimer = setTimeout(function(){ reader.classList.remove('closing'); }, 390);
+  }
+  function openReader(name){
+    var reader = document.getElementById(name + 'Reader');
+    if(!reader) return;
+    clearTimeout(closeTimer);
+    for(var i=0;i<readers.length;i++) readers[i].classList.remove('open','closing');
+    var frame = reader.querySelector('.reader-frame');
+    if(!frame.getAttribute('src')) frame.src = frame.getAttribute('data-reader-source');
+    reader.classList.add('open');
+    reader.setAttribute('aria-hidden','false');
+    document.body.classList.add('reader-open');
+    activeReader = reader;
+  }
+  for(var i=0;i<triggers.length;i++) triggers[i].addEventListener('click', function(){ openReader(this.getAttribute('data-reader-open')); });
+  for(var j=0;j<readers.length;j++){
+    var closeButtons = readers[j].querySelectorAll('[data-reader-close]');
+    for(var k=0;k<closeButtons.length;k++) closeButtons[k].addEventListener('click', closeReader);
+  }
+  addEventListener('keydown', function(event){ if(event.key === 'Escape') closeReader(); });
 })();
 
 /* 下部CTAは、上部で使っている埋め込みアプリアイコンを再利用する。 */
