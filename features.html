@@ -114,7 +114,9 @@ body.menu-open{ overflow:hidden; }
 /* ── footer ── */
 footer{ border-top:1px solid var(--line); padding:48px clamp(20px,5vw,64px); }
 .foot-in{ max-width:1120px; margin:0 auto; display:flex; justify-content:space-between; flex-wrap:wrap; gap:24px; }
+.footer-brand{ display:flex; align-items:baseline; gap:14px; }
 footer .logo{ color:#fff; font-size:1.05rem; }
+.footer-tagline{ margin:0; color:rgba(232,235,245,.72); font-family:'Zen Antique Logo','Zen Antique',serif; font-size:clamp(.62rem,1.35vw,.76rem); letter-spacing:.055em; white-space:nowrap; }
 footer nav.f{ position:static; padding:0; display:flex; gap:26px; flex-wrap:wrap; }
 footer .f a{ font-size:.8rem; color:var(--muted); text-decoration:none; }
 footer .f a:hover{ color:var(--ink); }
@@ -188,7 +190,10 @@ footer .copy{ width:100%; font-size:.7rem; color:#586074; margin-top:8px; }
         </section>
     <footer>
   <div class="foot-in">
-    <div class="logo">Miru</div>
+    <div class="footer-brand">
+      <div class="logo">Miru</div>
+      <p class="footer-tagline">Think freely. See clearly.</p>
+    </div>
     <nav class="f">
       <a href="#story">ストーリー</a>
       <a href="#developer">開発者について</a>
