@@ -246,8 +246,7 @@ footer .copy{ width:100%; font-size:.7rem; color:#586074; margin-top:8px; }
 
 /* 本文は後で追加する。共通テンプレートはトップページのソースをそのまま保持する。 */
 body.evidence-draft .hero,
-body.evidence-draft .flow > .section:not(.evidence-library),
-body.evidence-draft .flow > .close{display:none}
+body.evidence-draft .flow > .section:not(.evidence-library){display:none}
 .evidence-library{max-width:900px;padding-top:clamp(120px,18vh,180px)}
 .evidence-library h1{margin:0;color:var(--head);font-size:clamp(2rem,5vw,3.4rem);line-height:1.35}
 .evidence-lead{max-width:44em;color:#b9bfcd;line-height:2.1}
@@ -415,15 +414,6 @@ body.evidence-draft .flow > .close{display:none}
   </div>
 </section>
 
-<!-- 締め -->
-  <div class="close">
-  <h2>考えを、見えるかたちに。</h2>
-  <p>マインドマップ × 認知科学 × AI。Android で無料ではじめられます。</p>
-  <a class="close-app-link" href="#" onclick="return false" aria-label="Google PlayでMiruを入手">
-    <img class="close-app-icon" alt="">
-  </a>
-  </div>
-
   <section class="section evidence-library" id="evidence">
     <p class="eyebrow">EVIDENCE LIBRARY</p>
     <h1>設計の出発点を、<br>たどれるように。</h1>
@@ -453,6 +443,15 @@ body.evidence-draft .flow > .close{display:none}
       <article class="evidence-item"><p class="evidence-citation">Kivetz, R., Urminsky, O., &amp; Zheng, Y. (2006). <i>Journal of Marketing Research</i>, 43(1), 39–58. <a href="https://doi.org/10.1509/jmkr.43.1.39" target="_blank" rel="noopener noreferrer">DOI</a></p><p class="evidence-summary">カフェのポイント制度やオンライン評価制度で、報酬に近づくほど利用頻度・努力・再参加が増えることを検証しました。最初からボーナス印が付いたカードは、必要回数が同じでも早く達成されました。Miruはこの効果で行動を煽るのではなく、すでにある積み重ねを星空として見える化します。</p></article>
     </div>
   </section>
+
+  <!-- ストア導線：アプリアイコン自体をボタンとして扱う -->
+  <div class="close">
+    <h2>考えを、見えるかたちに。</h2>
+    <p>マインドマップ × 認知科学 × AI。Android で無料ではじめられます。</p>
+    <a class="close-app-link" href="#" onclick="return false" aria-label="Google PlayでMiruを入手">
+      <img class="close-app-icon" alt="">
+    </a>
+  </div>
 
   <footer>
   <div class="foot-in">
