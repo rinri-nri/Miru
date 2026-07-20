@@ -173,7 +173,12 @@ body.menu-open{ overflow:hidden; }
   background:radial-gradient(ellipse at 50% 120%, rgba(247,150,58,.20) 0%, transparent 60%); }
 .close h2{ font-size:clamp(1.6rem,3vw,2.4rem); color:var(--head); margin:0 0 12px; font-weight:700; }
 .close p{ color:var(--muted); margin:0 0 30px; font-size:.92rem; }
-.close .btn{ padding:14px 36px; font-size:1rem; }
+.close-app-link{ display:inline-block; border-radius:clamp(20px,3vw,28px); line-height:0;
+  box-shadow:0 16px 38px rgba(0,0,0,.38), 0 0 0 1px rgba(255,255,255,.12);
+  transition:transform .28s ease, box-shadow .28s ease; }
+.close-app-link:hover{ transform:translateY(-5px) scale(1.045); box-shadow:0 24px 46px rgba(0,0,0,.48), 0 0 24px rgba(247,150,58,.24); }
+.close-app-link:focus-visible{ outline:2px solid var(--gold); outline-offset:5px; }
+.close-app-icon{ display:block; width:clamp(76px,10vw,104px); aspect-ratio:1; border-radius:clamp(20px,3vw,28px); }
 
 /* ── footer ── */
 footer{ border-top:1px solid var(--line); padding:48px clamp(20px,5vw,64px); }
@@ -323,7 +328,9 @@ footer .copy{ width:100%; font-size:.7rem; color:#586074; margin-top:8px; }
 <div class="close">
   <h2>考えを、見えるかたちに。</h2>
   <p>マインドマップ × 認知科学 × AI。Android で無料ではじめられます。</p>
-  <a class="btn dawn" href="#" onclick="return false">Google Play で入手</a>
+  <a class="close-app-link" href="#" onclick="return false" aria-label="Google PlayでMiruを入手">
+    <img class="close-app-icon" alt="">
+  </a>
 </div>
 
 <footer>
@@ -388,6 +395,13 @@ footer .copy{ width:100%; font-size:.7rem; color:#586074; margin-top:8px; }
   for(var i=0;i<closeButtons.length;i++) closeButtons[i].addEventListener('click', closeMenu);
   for(var j=0;j<menuLinks.length;j++) menuLinks[j].addEventListener('click', closeMenu);
   addEventListener('keydown', function(event){ if(event.key === 'Escape') closeMenu(); });
+})();
+
+/* 下部CTAは、上部で使っている埋め込みアプリアイコンを再利用する。 */
+(function(){
+  var iconSource = document.querySelector('.about-icon img');
+  var closeIcon = document.querySelector('.close-app-icon');
+  if(iconSource && closeIcon) closeIcon.src = iconSource.currentSrc || iconSource.src;
 })();
 
 /* 同心円スタートレイル（右上を極・ゆっくり回転）。ストーリーページと共通の演出
