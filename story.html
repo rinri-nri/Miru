@@ -271,6 +271,22 @@ footer .copy{ width:100%; font-size:.7rem; color:#586074; margin-top:8px; }
   onScroll();
 })();
 
+(function(){
+  if(window.top === window) return;
+  var bar = document.getElementById('topbar');
+  var playButton = document.querySelector('.topbar .btn.dawn');
+  if(bar) bar.classList.add('show');
+  if(!playButton) return;
+  var style = document.createElement('style');
+  style.textContent = '#topbar{transform:translateY(0)!important;opacity:1!important}.reader-inner-close{display:grid;place-items:center;width:42px;height:42px;padding:0;border:0;color:#fff;background:transparent;cursor:pointer}.reader-inner-close svg{width:25px;height:25px;filter:drop-shadow(0 0 5px rgba(255,255,255,.82))}.reader-inner-close path{fill:none;stroke:currentColor;stroke-width:3.2;stroke-linecap:round}';
+  document.head.appendChild(style);
+  var close = document.createElement('button');
+  close.type = 'button'; close.className = 'reader-inner-close'; close.setAttribute('aria-label','閉じる');
+  close.innerHTML = '<svg viewBox="0 0 100 100" aria-hidden="true"><path d="M27 27 L44 44 M56 56 L73 73 M73 27 L56 44 M44 56 L27 73"/></svg>';
+  playButton.parentNode.replaceChild(close, playButton);
+  close.addEventListener('click', function(){ window.parent.postMessage('miru-reader-close','*'); });
+})();
+
 /* 同心円スタートレイル（右上を極・ゆっくり回転）。実績カード／トップページと同じ手法を固定背景に流用
    ── 負荷軽減（2026-07-20）：星数・セグメント数を削減（描画回数 約5,720→約1,000/フレーム）、
       DPR上限を下げ、タブが非表示のときは描画ループを止める */
