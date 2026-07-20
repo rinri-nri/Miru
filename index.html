@@ -221,6 +221,8 @@ body.reader-open{ overflow:hidden; }
 /* ── why / evidence teaser ── */
 .split{ display:grid; grid-template-columns:1fr 1fr; gap:clamp(28px,4vw,64px); align-items:center; }
 .card{ background:rgba(255,255,255,.04); border:1px solid var(--line); border-radius:18px; padding:34px 32px; }
+.card--transparent{ background:transparent; }
+.card .card-eyebrow{ letter-spacing:-.09em; margin-bottom:14px; }
 .card h2{ font-size:clamp(1.4rem,2.4vw,1.9rem); color:var(--head); margin:0 0 14px; font-weight:700; line-height:1.5; word-break:keep-all; line-break:strict; }
 .card p{ color:var(--muted); font-size:.9rem; line-height:2; margin:0 0 22px; }
 .reflist{ list-style:none; margin:0; padding:0; }
@@ -423,12 +425,14 @@ footer .copy{ width:100%; font-size:.7rem; color:#586074; margin-top:8px; }
 <!-- なぜこの機能 / エビデンス -->
 <section class="section" id="why">
   <div class="split">
-    <div class="card">
+    <div class="card card--transparent">
+      <p class="eyebrow card-eyebrow">Design Note</p>
       <h2>なぜ、この機能があるのか</h2>
       <p>Miruの主要な機能には、それが存在する理由と、根拠となる研究があります。「何ができるか」ではなく「なぜ作ったのか」を、機能ごとに書きました。</p>
       <a class="morelink" href="why.html">設計ドキュメントを読む</a>
     </div>
-    <div class="card" id="evidence">
+    <div class="card card--transparent" id="evidence">
+      <p class="eyebrow card-eyebrow">Evidence</p>
       <h2>エビデンスライブラリ</h2>
       <p>設計にあたって参照した研究を、著者・掲載誌・DOI付きで公開しています。出典を辿って、ご自身で確かめられます。</p>
       <ul class="reflist">
