@@ -254,6 +254,11 @@ body.evidence-draft .flow > .close{display:none}
 .evidence-note{margin:32px 0 52px;padding:18px 20px;border-left:2px solid var(--gold);background:rgba(255,255,255,.035);color:#cbd0db;font-size:.88rem;line-height:1.9}
 .evidence-group{margin-top:46px}.evidence-group h2{margin:0 0 18px;color:var(--head);font-size:clamp(1.2rem,3vw,1.55rem)}
 .evidence-item{padding:22px 0;border-top:1px solid var(--line)}.evidence-item:last-child{border-bottom:1px solid var(--line)}
+.evidence-item::before{display:block;margin:0 0 9px;color:var(--gold);font-size:.72rem;font-weight:700;letter-spacing:.11em}
+.evidence-group:nth-of-type(1) .evidence-item:nth-of-type(1)::before{content:"アクティブリコール"}.evidence-group:nth-of-type(1) .evidence-item:nth-of-type(2)::before{content:"間隔復習問題"}.evidence-group:nth-of-type(1) .evidence-item:nth-of-type(3)::before{content:"アクティブリコール・かんたんモード"}
+.evidence-group:nth-of-type(2) .evidence-item:nth-of-type(1)::before{content:"疑問・反論"}.evidence-group:nth-of-type(2) .evidence-item:nth-of-type(2)::before{content:"日次分析・週次分析"}.evidence-group:nth-of-type(2) .evidence-item:nth-of-type(3)::before{content:"多ビュー・AI対話"}
+.evidence-group:nth-of-type(3) .evidence-item:nth-of-type(1)::before{content:"自然音"}.evidence-group:nth-of-type(3) .evidence-item:nth-of-type(2)::before{content:"ポモドーロタイマー"}.evidence-group:nth-of-type(3) .evidence-item:nth-of-type(3)::before{content:"クイックメモ"}
+.evidence-group:nth-of-type(4) .evidence-item:nth-of-type(1)::before,.evidence-group:nth-of-type(4) .evidence-item:nth-of-type(2)::before{content:"統計情報カード・実績"}
 .evidence-item p{margin:0}.evidence-citation{color:#e5e8ef;font-size:.93rem;line-height:1.9}.evidence-summary{margin-top:9px!important;color:var(--muted);font-size:.86rem;line-height:1.9}
 .evidence-item a{color:var(--gold);text-decoration:none}.evidence-item a:hover{text-decoration:underline}
 </style>
