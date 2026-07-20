@@ -278,7 +278,7 @@ footer .copy{ width:100%; font-size:.7rem; color:#586074; margin-top:8px; }
   if(bar) bar.classList.add('show');
   if(!playButton) return;
   var style = document.createElement('style');
-  style.textContent = '#topbar{transform:translateY(0)!important;opacity:1!important}.reader-inner-close{display:grid;place-items:center;width:42px;height:42px;padding:0;border:0;color:#fff;background:transparent;cursor:pointer}.reader-inner-close svg{width:25px;height:25px;filter:drop-shadow(0 0 5px rgba(255,255,255,.82))}.reader-inner-close path{fill:none;stroke:currentColor;stroke-width:3.2;stroke-linecap:round}';
+  style.textContent = '#topbar{transform:translateY(0)!important;opacity:1!important}.doorway{padding-top:calc(clamp(28px,7vh,72px) + 52px)!important}.reader-inner-close{display:grid;place-items:center;width:42px;height:42px;padding:0;border:0;color:#fff;background:transparent;cursor:pointer}.reader-inner-close svg{width:25px;height:25px;filter:drop-shadow(0 0 5px rgba(255,255,255,.82))}.reader-inner-close path{fill:none;stroke:currentColor;stroke-width:3.2;stroke-linecap:round}';
   document.head.appendChild(style);
   var close = document.createElement('button');
   close.type = 'button'; close.className = 'reader-inner-close'; close.setAttribute('aria-label','閉じる');

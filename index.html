@@ -236,6 +236,8 @@ footer .copy{ width:100%; font-size:.7rem; color:#586074; margin-top:8px; }
   .hero h1, .close h2{ white-space:nowrap; font-size:clamp(1rem,5.2vw,1.3rem); letter-spacing:-.03em; }
   .about-h, .card h2{ font-size:clamp(1.12rem,5.4vw,1.35rem); }
   .cell h3{ font-size:1.02rem; }
+  .narrative h2{ font-size:clamp(1.18rem,5.4vw,1.5rem); line-height:1.55; word-break:normal; text-wrap:pretty; }
+  .narrative-copy{ font-size:.9rem; line-height:2; }
   .reader-window{ width:calc(100% - 16px); height:calc(100% - 16px); margin:8px 0; }
   .reader-frame{ border-radius:14px; }
   .grid4{ grid-template-columns:1fr; }
@@ -512,7 +514,7 @@ footer .copy{ width:100%; font-size:.7rem; color:#586074; margin-top:8px; }
     if(topbar) topbar.classList.add('show');
     if(!playButton || doc.querySelector('.reader-inner-close')) return;
     var style = doc.createElement('style');
-    style.textContent = '#topbar{transform:translateY(0)!important;opacity:1!important}.reader-inner-close{display:grid;place-items:center;width:42px;height:42px;padding:0;border:0;color:#fff;background:transparent;cursor:pointer;transition:transform .25s ease,filter .25s ease}.reader-inner-close svg{width:25px;height:25px;filter:drop-shadow(0 0 5px rgba(255,255,255,.82))}.reader-inner-close path{fill:none;stroke:currentColor;stroke-width:3.2;stroke-linecap:round}.reader-inner-close:hover{transform:rotate(12deg) scale(1.12);filter:drop-shadow(0 0 8px rgba(240,167,90,.6))}.reader-inner-close:focus-visible{outline:2px solid #e8c987;outline-offset:3px}';
+    style.textContent = '#topbar{transform:translateY(0)!important;opacity:1!important}.doorway{padding-top:calc(clamp(28px,7vh,72px) + 52px)!important}.reader-inner-close{display:grid;place-items:center;width:42px;height:42px;padding:0;border:0;color:#fff;background:transparent;cursor:pointer;transition:transform .25s ease,filter .25s ease}.reader-inner-close svg{width:25px;height:25px;filter:drop-shadow(0 0 5px rgba(255,255,255,.82))}.reader-inner-close path{fill:none;stroke:currentColor;stroke-width:3.2;stroke-linecap:round}.reader-inner-close:hover{transform:rotate(12deg) scale(1.12);filter:drop-shadow(0 0 8px rgba(240,167,90,.6))}.reader-inner-close:focus-visible{outline:2px solid #e8c987;outline-offset:3px}';
     doc.head.appendChild(style);
     var close = doc.createElement('button');
     close.type = 'button';
