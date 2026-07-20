@@ -1,0 +1,367 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0a0f20">
+  <title>なぜ、この機能があるのか ── Miru</title>
+  <style>
+    :root{
+      --bg:#0a0f20; --ink:#e8e8ea; --head:#d9deea; --muted:#9ba4b8;
+      --line:rgba(255,255,255,.11); --gold:#e8c987; --violet:#718bef;
+      --card:rgba(255,255,255,.045); --card-strong:rgba(255,255,255,.075);
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth;scrollbar-width:none;-ms-overflow-style:none}
+    html::-webkit-scrollbar{display:none}
+    body{margin:0;overflow-x:hidden;background:var(--bg);color:var(--ink);
+      font-family:"Zen Maru Gothic","Hiragino Maru Gothic ProN","Yu Gothic UI","Yu Gothic","Meiryo",sans-serif;
+      font-feature-settings:"palt";line-height:1.95;-webkit-font-smoothing:antialiased}
+    a{color:inherit}
+    button{font:inherit}
+    :focus-visible{outline:2px solid var(--gold);outline-offset:4px}
+    @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+
+    .logo{font-family:"Zen Antique Logo","Hiragino Mincho ProN","Yu Mincho",serif;font-weight:400;letter-spacing:-.09em}
+    .logo .u{position:relative}
+    .logo .spk{position:absolute;width:.46em;height:.46em;top:.26em;right:-.12em;filter:drop-shadow(0 0 4px rgba(130,150,240,.5))}
+
+    /* スクロール後に、透明な状態からガラス感だけが後追いで育つトップバー */
+    .topbar{position:fixed;inset:0 0 auto;z-index:30;display:flex;align-items:center;justify-content:space-between;
+      padding:8px clamp(20px,5vw,64px);visibility:hidden;opacity:0;pointer-events:none;
+      background:rgba(12,16,32,0);border-bottom:1px solid rgba(255,255,255,0);
+      backdrop-filter:blur(0) saturate(1);-webkit-backdrop-filter:blur(0) saturate(1);
+      transition:opacity .28s ease,visibility 0s linear .38s,background .38s ease,backdrop-filter .38s ease,-webkit-backdrop-filter .38s ease,border-color .38s ease}
+    .topbar.show,.topbar.hiding{visibility:visible;opacity:1;transition-delay:0s,0s,.12s,.12s,.12s,.12s}
+    .topbar.show{pointer-events:auto;background:rgba(12,16,32,.56);border-bottom-color:rgba(255,255,255,.06);
+      backdrop-filter:blur(18px) saturate(1.28);-webkit-backdrop-filter:blur(18px) saturate(1.28)}
+    .topbar.hiding{pointer-events:none;background:rgba(12,16,32,0);border-bottom-color:rgba(255,255,255,0);
+      backdrop-filter:blur(0) saturate(1);-webkit-backdrop-filter:blur(0) saturate(1);transition-delay:0s}
+    .topbar .logo{font-size:1.575rem;color:#fff}
+    .top-actions{display:flex;align-items:center;gap:14px}
+    .top-home{font-size:.8rem;color:#dfe3ee;text-decoration:none;opacity:.86}
+    .top-home:hover{opacity:1}
+    .spark-menu{width:42px;height:42px;display:grid;place-items:center;padding:0;border:0;border-radius:50%;cursor:pointer;
+      color:#f0a75a;background:transparent;filter:drop-shadow(0 0 5px rgba(240,167,90,.45));transition:transform .25s ease,filter .25s ease}
+    .spark-menu svg{width:25px;height:25px}
+    .spark-menu:hover{transform:rotate(12deg) scale(1.12);filter:drop-shadow(0 0 10px rgba(240,167,90,.8))}
+
+    /* 右から出すパネルではなく、ページ全体を覆うガラスの目次 */
+    .menu-layer{position:fixed;inset:0;z-index:40;display:flex;justify-content:center;pointer-events:none;opacity:0;transition:none}
+    .menu-layer.open,.menu-layer.closing{opacity:1}
+    .menu-layer.open{pointer-events:auto}
+    .menu-scrim{position:absolute;inset:0;background:rgba(4,8,18,0);backdrop-filter:blur(0) saturate(1);-webkit-backdrop-filter:blur(0) saturate(1);
+      transition:background .36s ease,backdrop-filter .36s ease,-webkit-backdrop-filter .36s ease}
+    .menu-layer.open .menu-scrim{background:rgba(4,8,18,.52);backdrop-filter:blur(18px) saturate(1.12);-webkit-backdrop-filter:blur(18px) saturate(1.12)}
+    .menu-panel{position:relative;width:min(540px,calc(100% - 40px));max-height:100%;overflow:auto;padding:94px 0 48px;opacity:0;
+      transition:opacity .22s ease;scrollbar-width:none;-ms-overflow-style:none}
+    .menu-panel::-webkit-scrollbar{width:0;height:0}
+    .menu-layer.open .menu-panel{opacity:1;transition-delay:.12s}
+    .menu-layer.closing .menu-panel{opacity:0;transition-delay:0s}
+    .menu-top{display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);padding:0 0 18px}
+    .menu-title{margin:0;font-size:1rem;font-weight:700;letter-spacing:.04em}
+    .menu-close{position:fixed;top:8px;right:clamp(20px,5vw,64px);display:grid;place-items:center;width:42px;height:42px;padding:0;border:0;color:#fff;background:transparent;cursor:pointer;
+      transition:transform .25s ease,filter .25s ease}
+    .menu-close svg{width:25px;height:25px;filter:drop-shadow(0 0 5px rgba(255,255,255,.82))}
+    .menu-close path{fill:none;stroke:currentColor;stroke-width:3.2;stroke-linecap:round}
+    .menu-close:hover{transform:rotate(12deg) scale(1.12);filter:drop-shadow(0 0 8px rgba(240,167,90,.6))}
+    .menu-group{padding:27px 0;border-bottom:1px solid var(--line)}
+    .menu-label{margin:0 0 10px;color:var(--gold);font-size:.72rem;font-weight:700;letter-spacing:.12em}
+    .menu-group a{display:block;padding:7px 0;color:#e4e7ee;font-size:.94rem;text-decoration:none}
+    .menu-group a:hover{color:var(--gold)}
+    body.menu-open{overflow:hidden}
+
+    .page{position:relative;isolation:isolate;overflow:hidden;background:
+      radial-gradient(ellipse 72% 38% at 88% 8%,rgba(81,112,221,.18),transparent 70%),
+      radial-gradient(ellipse 70% 32% at 14% 98%,rgba(224,138,62,.22),transparent 70%),
+      linear-gradient(180deg,#0b1322 0%,#0e1e45 26%,#132d4d 52%,#262018 77%,#49300f 100%)}
+    .page::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.5;background-image:
+      radial-gradient(circle at 12% 18%,#fff 0 1px,transparent 1.6px),radial-gradient(circle at 75% 10%,#e8c987 0 1px,transparent 1.7px),radial-gradient(circle at 58% 62%,#fff 0 .8px,transparent 1.4px),radial-gradient(circle at 92% 54%,#fff 0 .8px,transparent 1.4px);background-size:210px 190px,270px 240px,180px 230px,320px 290px}
+    .inner{width:min(100% - 40px,760px);margin-inline:auto}
+    .hero{min-height:max(590px,72vh);display:grid;place-items:center;padding:112px 0 84px;text-align:center}
+    .hero-content{max-width:680px}
+    .app-icon{width:clamp(86px,13vw,116px);aspect-ratio:1;margin:0 auto 29px;border-radius:26%;overflow:hidden;box-shadow:0 18px 44px rgba(0,0,0,.38)}
+    .app-icon svg{display:block;width:100%;height:100%}
+    .eyebrow{margin:0 0 14px;color:var(--gold);font-size:.72rem;font-weight:700;letter-spacing:.18em}
+    h1,h2,h3{word-break:keep-all;overflow-wrap:normal;text-wrap:balance}
+    h1{margin:0;color:var(--head);font-size:clamp(1.8rem,5vw,3rem);line-height:1.48;letter-spacing:-.03em}
+    .hero-copy{max-width:37em;margin:23px auto 0;color:#bdc4d4;font-size:clamp(.91rem,1.7vw,1rem);line-height:2.08}
+    .hero-copy strong{color:#f1e5c9;font-weight:700}
+    .hero-toc{display:flex;justify-content:center;flex-wrap:wrap;gap:9px;margin-top:34px}
+    .hero-toc a{padding:7px 13px;border:1px solid rgba(255,255,255,.17);border-radius:999px;background:rgba(255,255,255,.045);color:#e3e7f0;font-size:.76rem;text-decoration:none;transition:border-color .2s,background .2s}
+    .hero-toc a:hover{border-color:rgba(232,201,135,.62);background:rgba(232,201,135,.12)}
+
+    .intro{padding:0 0 clamp(64px,10vh,108px);scroll-margin-top:86px}
+    .intro-card{padding:clamp(26px,5vw,42px);border:1px solid var(--line);border-radius:22px;background:linear-gradient(145deg,rgba(255,255,255,.09),rgba(255,255,255,.025));box-shadow:0 24px 60px rgba(0,0,0,.13)}
+    .intro-card h2{margin:0 0 18px;color:var(--head);font-size:clamp(1.25rem,3vw,1.65rem);line-height:1.55}
+    .intro-card p{margin:0;color:#c4cad8;font-size:.94rem;line-height:2.12}
+    .intro-card p + p{margin-top:1.2em}
+    .note{margin-top:20px;padding:13px 16px;border-left:2px solid var(--gold);background:rgba(232,201,135,.08);color:#d6d6d4;font-size:.82rem;line-height:1.9}
+
+    .feature{position:relative;padding:clamp(66px,11vh,122px) 0;scroll-margin-top:75px}
+    .feature::before{content:"";position:absolute;left:50%;top:0;width:100vw;transform:translateX(-50%);border-top:1px solid var(--line)}
+    .feature-head{display:grid;grid-template-columns:auto 1fr;gap:19px;align-items:baseline;margin-bottom:32px}
+    .feature-no{color:var(--gold);font-family:Montserrat,"Segoe UI",sans-serif;font-size:.78rem;font-weight:700;letter-spacing:.08em;white-space:nowrap}
+    .feature h2{margin:0;color:var(--head);font-size:clamp(1.32rem,3.1vw,1.86rem);line-height:1.5;letter-spacing:-.02em}
+    .feature-grid{display:grid;gap:15px}
+    .block{padding:clamp(21px,4vw,30px);border:1px solid rgba(255,255,255,.09);border-radius:17px;background:var(--card)}
+    .block h3{margin:0 0 13px;color:var(--gold);font-size:.76rem;letter-spacing:.11em}
+    .block p{margin:0;color:#c6ccd9;font-size:.93rem;line-height:2.1}
+    .block p + p{margin-top:1.25em}
+    .block strong{color:#f0e7d6;font-weight:700}
+    .research{background:var(--card-strong)}
+    .research ul{display:grid;gap:16px;margin:0;padding:0;list-style:none}
+    .research li{color:#bdc5d4;font-size:.84rem;line-height:1.9}
+    .research a{color:#dfc887;overflow-wrap:anywhere;text-decoration-color:rgba(223,200,135,.45);text-underline-offset:3px}
+    .study-note{display:block;margin-top:4px;color:#919bad}
+    .subsection{margin-top:26px;padding-top:26px;border-top:1px solid var(--line)}
+    .subsection h3{margin:0 0 13px;color:#e5e8ef;font-size:1.02rem;line-height:1.65}
+
+    .finish{padding:clamp(78px,13vh,148px) 0 54px;text-align:center}
+    .finish h2{margin:0;color:var(--head);font-size:clamp(1.42rem,3.8vw,2.15rem);line-height:1.55}
+    .finish p{max-width:35em;margin:14px auto 30px;color:#b7bece;font-size:.91rem;line-height:2}
+    .finish .app-icon{margin-bottom:0;transition:transform .25s ease,box-shadow .25s ease}
+    .finish a{display:inline-block;border-radius:26%;outline-offset:7px}
+    .finish a:hover .app-icon{transform:translateY(-4px) rotate(-2deg);box-shadow:0 22px 52px rgba(0,0,0,.48)}
+
+    footer{position:relative;border-top:1px solid var(--line);padding:45px 0 50px}
+    .foot{display:flex;justify-content:space-between;gap:28px;flex-wrap:wrap}
+    footer .logo{color:#fff;font-size:1.1rem}
+    .foot-links{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:10px 22px}
+    .foot-links a{color:#aeb6c5;font-size:.78rem;text-decoration:none}
+    .foot-links a:hover{color:#fff}
+    .copyright{width:100%;margin:0;color:#737d91;font-size:.7rem;line-height:1.8}
+
+    @media (max-width:560px){
+      .inner{width:min(100% - 32px,760px)}
+      .top-home{display:none}
+      .hero{min-height:66vh;padding:92px 0 58px}
+      .app-icon{width:92px;margin-bottom:24px}
+      h1{font-size:clamp(1.55rem,7vw,2rem);line-height:1.55}
+      .hero-copy{font-size:.89rem;line-height:2.02}
+      .hero-toc{gap:7px;margin-top:27px}
+      .hero-toc a{padding:6px 11px;font-size:.7rem}
+      .feature{padding:58px 0}
+      .feature-head{gap:8px;grid-template-columns:1fr;margin-bottom:25px}
+      .feature h2{font-size:1.34rem;line-height:1.6}
+      .block{padding:20px 18px}
+      .block p{font-size:.88rem;line-height:2.04}
+      .research li{font-size:.8rem}
+      .menu-panel{width:calc(100% - 32px);padding-top:90px}
+      .finish{padding-top:70px}
+      .foot-links{justify-content:flex-start}
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar" id="topbar">
+    <a class="logo" href="index.html" aria-label="Miru トップページ">Mir<span class="u">u<svg class="spk" viewBox="0 0 100 100" aria-hidden="true"><defs><linearGradient id="logo-spark" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6d8cf5"/><stop offset="1" stop-color="#f0a75a"/></linearGradient></defs><path d="M50 2C56 36 64 44 98 50C64 56 56 64 50 98C44 64 36 56 2 50C36 44 44 36 50 2Z" fill="url(#logo-spark)"/></svg></span></a>
+    <div class="top-actions">
+      <a class="top-home" href="index.html">トップへ</a>
+      <button class="spark-menu" id="menuOpen" type="button" aria-label="目次を開く" aria-expanded="false" aria-controls="siteMenu"><svg viewBox="0 0 100 100" aria-hidden="true"><path d="M50 2C56 36 64 44 98 50C64 56 56 64 50 98C44 64 36 56 2 50C36 44 44 36 50 2Z" fill="currentColor"/></svg></button>
+    </div>
+  </header>
+
+  <div class="menu-layer" id="siteMenu" aria-hidden="true">
+    <div class="menu-scrim" data-menu-close></div>
+    <aside class="menu-panel" aria-label="サイト目次">
+      <div class="menu-top">
+        <p class="menu-title">目次</p>
+        <button class="menu-close" type="button" aria-label="目次を閉じる" data-menu-close><svg viewBox="0 0 100 100" aria-hidden="true"><path d="M27 27L44 44M56 56L73 73M73 27L56 44M44 56L27 73"/></svg></button>
+      </div>
+      <nav>
+        <div class="menu-group">
+          <p class="menu-label">このページ</p>
+          <a href="#top">はじめに</a>
+          <a href="#recall">アクティブリコール</a>
+          <a href="#spaced">間隔復習問題</a>
+          <a href="#opposite">疑問・反論</a>
+          <a href="#review">日次・週次分析</a>
+          <a href="#views">多ビュー</a>
+          <a href="#sound">自然音・ポモドーロ</a>
+          <a href="#quick">クイックメモ</a>
+          <a href="#ai-chat">AI対話</a>
+          <a href="#builder">空行分割・階層ビルダー</a>
+          <a href="#stats">統計情報カード・実績</a>
+        </div>
+        <div class="menu-group">
+          <p class="menu-label">サイトを読む</p>
+          <a href="index.html">トップ</a>
+          <a href="index.html#story">ストーリー</a>
+          <a href="index.html#developer">開発者について</a>
+          <a href="index.html#evidence">エビデンス</a>
+        </div>
+        <div class="menu-group">
+          <p class="menu-label">サポート・ポリシー</p>
+          <a href="mailto:miru.mindmap.support@gmail.com">お問い合わせ</a>
+          <a href="../legal/privacy.html">プライバシーポリシー</a>
+          <a href="../legal/terms.html">利用規約</a>
+          <a href="../legal/tokushouhou.html">特定商取引法に基づく表記</a>
+        </div>
+      </nav>
+    </aside>
+  </div>
+
+  <main class="page">
+    <section class="hero inner" id="top">
+      <div class="hero-content">
+        <div class="app-icon" aria-label="Miruアプリアイコン">
+          <svg viewBox="0 0 108 108" role="img" aria-label="Miru">
+            <defs>
+              <linearGradient id="icon-base" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff6d00"/><stop offset="1" stop-color="#4527a0"/></linearGradient>
+              <radialGradient id="icon-cyan" cx=".85" cy=".15" r=".75"><stop offset="0" stop-color="#00e5ff" stop-opacity=".8"/><stop offset=".6" stop-color="#00e5ff" stop-opacity=".32"/><stop offset="1" stop-color="#00e5ff" stop-opacity="0"/></radialGradient>
+              <radialGradient id="icon-pink" cx=".15" cy=".85" r=".72"><stop offset="0" stop-color="#ff4081" stop-opacity=".8"/><stop offset=".6" stop-color="#ff4081" stop-opacity=".32"/><stop offset="1" stop-color="#ff4081" stop-opacity="0"/></radialGradient>
+              <clipPath id="icon-clip"><rect width="108" height="108" rx="25"/></clipPath>
+            </defs>
+            <g clip-path="url(#icon-clip)"><rect width="108" height="108" fill="url(#icon-base)"/><rect width="108" height="108" fill="url(#icon-cyan)"/><rect width="108" height="108" fill="url(#icon-pink)"/>
+              <path fill="#fff" d="M24.452 64V46.169h4.942l7.132 11.641h-2.598l6.928-11.641h4.942L45.849 64h-5.477l-.051-9.578h.866l-4.738 7.973H33.8l-4.942-7.973h1.07V64Zm24.122 0V50.067h5.757V64Zm2.879-15.054q-1.58 0-2.522-.841-.942-.84-.942-2.088 0-1.248.942-2.089.942-.84 2.522-.84 1.579 0 2.522.789.942.79.942 2.038 0 1.325-.942 2.178-.943.853-2.522.853ZM56.878 64V50.067h5.477v4.202l-.892-1.197q.637-1.63 2.038-2.445 1.401-.815 3.362-.815v5.095q-.382-.051-.675-.076-.293-.026-.599-.026-1.299 0-2.127.675-.828.675-.828 2.331V64Zm17.423.255q-1.656 0-2.993-.675-1.337-.675-2.101-2.114-.764-1.439-.764-3.707v-7.693H74.2v6.699q0 1.477.484 2.063.484.586 1.324.586.51 0 .955-.267.446-.268.726-.892.28-.624.28-1.643v-6.546h5.757V64H78.25v-4.025l1.095 1.096q-.739 1.63-2.101 2.407-1.363.777-2.943.777Z"/>
+              <path fill="#fff" d="m82 36 1.57 3.93L87 41l-3.43 1.07L82 46l-1.57-3.93L77 41l3.43-1.07Z"/>
+            </g>
+          </svg>
+        </div>
+        <p class="eyebrow">DESIGN NOTES</p>
+        <h1>なぜ、この機能があるのか</h1>
+        <p class="hero-copy">Miruは、便利そうな機能を並べたアプリではありません。<strong>人間がつまずく場所</strong>と、そこに使える知見から、機能を組み立てています。ここでは「何ができるか」ではなく、「なぜ作ったのか」を書きます。</p>
+        <nav class="hero-toc" aria-label="主要な設計テーマ">
+          <a href="#recall">記憶する</a><a href="#opposite">見落としを減らす</a><a href="#views">観かたを変える</a><a href="#sound">集中を守る</a><a href="#ai-chat">対話を残す</a>
+        </nav>
+      </div>
+    </section>
+
+    <section class="intro inner" id="introduction">
+      <div class="intro-card">
+        <h2>主な機能には、理由がある。</h2>
+        <p>人間は、忘れます。分かった気になります。自分の考えを支持する情報ばかり集めます。そして、手を動かしている最中には、自分の思考を客観視しづらくなります。</p>
+        <p>Miruは、人間をもっと強くするためのアプリではありません。<strong>人間の弱点を変えようとせず、弱点を前提にした仕組みを置く</strong>ためのアプリです。</p>
+        <div class="note">ここで挙げる研究は、各機能の出発点です。ただし、すべての理由が科学だけで決まるわけではありません。月の光が休憩時間に流れる理由のように、ただ好きだからという理由も、Miruにはあります。</div>
+      </div>
+    </section>
+
+    <article class="feature inner" id="recall">
+      <div class="feature-head"><span class="feature-no">01 / 09</span><h2>アクティブリコール</h2></div>
+      <div class="feature-grid">
+        <section class="block"><h3>解決したい問題</h3><p>「読み返す」「マーカーを引く」という勉強法は、やった感があるわりに記憶に残りません。読んでいる最中は内容が目の前にあるので、脳は「思い出す」という一番負荷のかかる仕事をサボれてしまうからです。分かった気になる───人間の認知の中でも、特にタチの悪い錯覚です。</p></section>
+        <section class="block"><h3>設計</h3><p>Miruのアクティブリコール機能は、作り込んだキャンバスをあえて隠します。ノードが見えない状態で「ここには何が書いてあったか」を自力で思い出す。思い出せたかどうかを自分で確認する。それだけの、しかし効果が実証され続けてきた学習法です。</p><p>あえてハードルの低い「かんたんモード」も用意しています。明示的な「楽な逃げ道」が用意された目標の方が、硬い目標よりも途中で放棄されにくいという知見があるからです。完璧な想起を毎回自分に課すより、続くことの方がずっと大事です。</p></section>
+        <section class="block research"><h3>参考にした研究</h3><ul><li>Roediger, H. L., &amp; Karpicke, J. D. (2006). Test-enhanced learning: Taking memory tests improves long-term retention. <i>Psychological Science</i>, 17(3), 249–255. <a href="https://doi.org/10.1111/j.1467-9280.2006.01693.x" target="_blank" rel="noopener noreferrer">doi:10.1111/j.1467-9280.2006.01693.x</a><span class="study-note">再読よりもテスト（想起）の方が長期記憶の保持を大きく改善することを示した代表的研究。</span></li><li>Sharif, M. A., &amp; Shu, S. B. (2017). The benefits of emergency reserves: Greater preference and persistence for goals that have slack with a cost. <i>Journal of Marketing Research</i>, 54(3), 495–509. <a href="https://doi.org/10.1509/jmr.15.0231" target="_blank" rel="noopener noreferrer">doi:10.1509/jmr.15.0231</a><span class="study-note">明示的な「逃げ道（スラック）」付きの目標の方が、硬い目標より継続されやすいことを示した研究。かんたんモードの根拠です。</span></li></ul></section>
+      </div>
+    </article>
+
+    <article class="feature inner" id="spaced">
+      <div class="feature-head"><span class="feature-no">02 / 09</span><h2>間隔復習問題</h2></div>
+      <div class="feature-grid">
+        <section class="block"><h3>解決したい問題</h3><p>人間は忘れます。一夜漬けの知識が試験の一週間後に消えているのは、意志が弱いからではなく、記憶というシステムがそう出来ているからです。忘却と戦うのではなく、忘却のカーブに合わせて復習を差し込む───それが唯一まともに機能する戦略です。</p></section>
+        <section class="block"><h3>設計</h3><p>Miruでは、AIが生成した問題や自作の問題がキャンバスごとの問題集として蓄積され、間隔を空けて再出題されます。一度解いて終わりではなく、忘れかけた頃にもう一度出会う。この「忘れかけた頃」こそが、記憶を最も強く定着させるタイミングだからです。</p></section>
+        <section class="block research"><h3>参考にした研究</h3><ul><li>Cepeda, N. J., Pashler, H., Vul, E., Wixted, J. T., &amp; Rohrer, D. (2006). Distributed practice in verbal recall tasks: A review and quantitative synthesis. <i>Psychological Bulletin</i>, 132(3), 354–380. <a href="https://doi.org/10.1037/0033-2909.132.3.354" target="_blank" rel="noopener noreferrer">doi:10.1037/0033-2909.132.3.354</a><span class="study-note">317実験・839件の評価を統合したメタ分析。詰め込みより分散学習が一貫して優れることを示した研究です。</span></li></ul></section>
+      </div>
+    </article>
+
+    <article class="feature inner" id="opposite">
+      <div class="feature-head"><span class="feature-no">03 / 09</span><h2>疑問・反論</h2></div>
+      <div class="feature-grid">
+        <section class="block"><h3>解決したい問題</h3><p>人は、自分の考えを支持する情報ばかり集めてしまいます。確証バイアスです。厄介なのは、「公平に考えよう」と意識するだけではほとんど直らないことです。自分のキャンバスを眺めて「よく出来ている」と感じるとき、その感覚自体が疑わしい。</p></section>
+        <section class="block"><h3>設計</h3><p>疑問・反論機能は、あなたが作っているキャンバスに対して、どういう視点が欠けているのか、思わぬ盲点は無いか、AIに批判的な意見を出させる機能です。ポイントは、「反対の可能性を具体的に考えさせる」ことが、単なる「公平になれ」という自戒よりも実際に判断を矯正するという研究があることです。自分でやるのが難しいなら、外部の道具にやらせればいい。</p></section>
+        <section class="block research"><h3>参考にした研究</h3><ul><li>Lord, C. G., Lepper, M. R., &amp; Preston, E. (1984). Considering the opposite: A corrective strategy for social judgment. <i>Journal of Personality and Social Psychology</i>, 47(6), 1231–1243. <a href="https://doi.org/10.1037/0022-3514.47.6.1231" target="_blank" rel="noopener noreferrer">doi:10.1037/0022-3514.47.6.1231</a><span class="study-note">「反対側を考えよ」という戦略が、「公平で偏りなくあれ」という指示よりもバイアス矯正に効くことを示した研究です。</span></li></ul></section>
+      </div>
+    </article>
+
+    <article class="feature inner" id="review">
+      <div class="feature-head"><span class="feature-no">04 / 09</span><h2>日次分析・週次分析</h2></div>
+      <div class="feature-grid">
+        <section class="block"><h3>解決したい問題</h3><p>手を動かしている最中の人間は、自分の思考を客観視できません。振り返りには効果がある───と誰もが言いますが、実際に立ち止まって振り返る時間を取る人はほとんどいません。面倒だからです。</p></section>
+        <section class="block"><h3>設計</h3><p>日次分析は、1日1回、対象のキャンバスに対して数千文字レベルの詳細なレポートを受け取れる機能です。単発の疑問・反論よりも深く、精度の高い意見が得られます。週次分析はさらにハイレベルな機能で、全キャンバスを対象に、週に1度、より深く多角的な観点からあなたの思考の傾向を分析します。</p><p>もちろん、あなた自身の言葉を最も重視します。AIが生成したノードに対しては軽い重み付けをします。分析されるべきはあなたの思考であって、AIの出力ではないからです。</p></section>
+        <section class="block research"><h3>参考にした研究</h3><ul><li>Di Stefano, G., Gino, F., Pisano, G. P., &amp; Staats, B. R. (2014). Learning by thinking: How reflection can spur progress along the learning curve. Harvard Business School Working Paper No. 14-093. <a href="https://doi.org/10.2139/ssrn.2414478" target="_blank" rel="noopener noreferrer">doi:10.2139/ssrn.2414478</a><span class="study-note">作業後に振り返りの時間を取った群が、追加練習をした群よりも成績を伸ばしたことを示した研究。ワーキングペーパーである点は明記しています。</span></li></ul></section>
+      </div>
+    </article>
+
+    <article class="feature inner" id="views">
+      <div class="feature-head"><span class="feature-no">05 / 09</span><h2>多ビュー<br>行列表・アウトライン・カンバン・グラフ</h2></div>
+      <div class="feature-grid">
+        <section class="block"><h3>解決したい問題</h3><p>同じ情報でも、表現のかたちが変わるだけで、見えるものが変わります。マインドマップとして眺めていたときには気付かなかった抜け漏れが、表に並べ直した途端に浮かび上がる───これは気のせいではなく、認知科学が古くから指摘してきた現象です。</p></section>
+        <section class="block"><h3>設計</h3><p>Miruでは、ひとつのマインドマップを行列表・アウトライン・カンバン・グラフビューという別の表示方法で観ることができます。どのビューでも閲覧だけでなく編集ができます。別の見方をする事で、抜け漏れを発見出来る確率が上がる。思考を様々な方法で可視化する───だからMiruなのです。</p></section>
+        <section class="block research"><h3>参考にした研究</h3><ul><li>Larkin, J. H., &amp; Simon, H. A. (1987). Why a diagram is (sometimes) worth ten thousand words. <i>Cognitive Science</i>, 11(1), 65–100. <a href="https://doi.org/10.1111/j.1551-6708.1987.tb00863.x" target="_blank" rel="noopener noreferrer">doi:10.1111/j.1551-6708.1987.tb00863.x</a><span class="study-note">情報として等価でも、表現形式が違えば探索・認識のしやすさが劇的に変わることを示した古典です。</span></li></ul></section>
+      </div>
+    </article>
+
+    <article class="feature inner" id="sound">
+      <div class="feature-head"><span class="feature-no">06 / 09</span><h2>自然音・ポモドーロタイマー</h2></div>
+      <div class="feature-grid">
+        <section class="block"><h3>解決したい問題・設計</h3><p>このアプリは、ユーザーの思考を妨げないという設計思想で作られています。しかし、その設計思想をさらに推し進めるならば、このアプリが思考を妨げない事はもちろん、このアプリ外の現代人の集中力を奪っているものからユーザーを守るべきでしょう。</p><p>だからこそ、作業用BGM機能が、このアプリ内で完結できるようになればいいと思い、自然音を流せる機能を実装したのです。私自身もよくYouTubeなどで作業用BGMを探すのですが、いつの間にかおすすめ動画をポチっと押してしまうのはあるあるです。なので、この機能実装は私の悩みを解決するものでもあったわけです。</p><p>ちなみに私は自然音オタクなので、YouTubeの自作した自然音再生リストには100本近い自然音の動画が入っています。Miruに入っている自然音についても、随分探し回って「これがいい」と納得できる自然音源を見つけてきました。今はまだ●●種類の自然音しかありませんが、今後追加予定です。何か要望があればお応えすることもあると思います。</p><div class="subsection"><h3>なぜ「自然音」なのか</h3><p>BGMなら何でもいいわけではありません。自然音には、ストレス後の生理的な回復を早め、疲弊した注意を回復させる効果を示した研究があります。歌詞のある音楽やノイズと違い、自然音は思考のリソースを奪わない。「思考を妨げない」という設計思想と、最も相性のいい音なのです。</p></div><div class="subsection"><h3>ポモドーロタイマーと月の光</h3><p>BGM機能には、ポモドーロタイマーも内蔵しています。集中と休憩を一定のリズムで繰り返す、有名な時間管理法です。短い中断を挟むだけで注意低下を防げること、また構造化された休憩の方が疲労や注意散漫が少ないことが示されています。</p><p>そして休憩時間には、ドビュッシーの「月の光」が流れます。こちらには科学的根拠はありません。私の好きなクラシックだからです。中学生の頃にYouTubeでピアノ演奏の動画を見つけてから、ずっと聴いてきました。なぜ好きなのかは、言語化できません。理由もなく、ただ好きなだけです。</p></div></section>
+        <section class="block research"><h3>参考にした研究</h3><ul><li>Alvarsson, J. J., Wiens, S., &amp; Nilsson, M. E. (2010). Stress recovery during exposure to nature sound and environmental noise. <i>International Journal of Environmental Research and Public Health</i>, 7(3), 1036–1046. <a href="https://doi.org/10.3390/ijerph7031036" target="_blank" rel="noopener noreferrer">doi:10.3390/ijerph7031036</a><span class="study-note">ストレス負荷後、自然音を聞いた群の方が環境騒音よりも回復が速い傾向を示した研究です。</span></li><li>Kaplan, S. (1995). The restorative benefits of nature: Toward an integrative framework. <i>Journal of Environmental Psychology</i>, 15(3), 169–182. <a href="https://doi.org/10.1016/0272-4944(95)90001-2" target="_blank" rel="noopener noreferrer">doi:10.1016/0272-4944(95)90001-2</a><span class="study-note">注意回復理論（ART）。自然環境が消耗した注意の回復に適していることを枠組み化した古典です。</span></li><li>Ariga, A., &amp; Lleras, A. (2011). Brief and rare mental “breaks” keep you focused. <i>Cognition</i>, 118(3), 439–443. <a href="https://doi.org/10.1016/j.cognition.2010.12.007" target="_blank" rel="noopener noreferrer">doi:10.1016/j.cognition.2010.12.007</a><span class="study-note">短い中断が連続作業での注意低下を防ぐことの根拠です。あわせて Biwer et al. (2023), <i>British Journal of Educational Psychology</i>, <a href="https://doi.org/10.1111/bjep.12593" target="_blank" rel="noopener noreferrer">doi:10.1111/bjep.12593</a> を参照しています。</span></li></ul></section>
+      </div>
+    </article>
+
+    <article class="feature inner" id="quick">
+      <div class="feature-head"><span class="feature-no">07 / 09</span><h2>クイックメモ</h2></div>
+      <div class="feature-grid">
+        <section class="block"><h3>解決したい問題・設計</h3><p>一瞬の閃きを逃さないために、クイックメモ機能もあります。Miruを開いて、キャンバスを開いて、ノードを作って────とやっている間にアイデアを逃すかもしれない。そんな時のために、クイックメモはあります。クイックメモに書いた事は、後から指定したキャンバスにノードとして直接配置出来るようになっています。さらに、音声入力機能もあるので、アイデアの書き留めには最適です。</p><div class="subsection"><h3>なぜ「すぐ外に出す」のか</h3><p>頭の中に置いておける情報の量は、驚くほど少ない。だから、覚えておこうとするのではなく、物理的な行動で外部に預けてしまう───認知科学ではこれをコグニティブ・オフローディング（認知的オフロード）と呼びます。書き留めた瞬間、脳は「覚えておく」仕事から解放され、考える仕事に戻れるのです。</p></div></section>
+        <section class="block research"><h3>参考にした研究</h3><ul><li>Risko, E. F., &amp; Gilbert, S. J. (2016). Cognitive offloading. <i>Trends in Cognitive Sciences</i>, 20(9), 676–688. <a href="https://doi.org/10.1016/j.tics.2016.07.002" target="_blank" rel="noopener noreferrer">doi:10.1016/j.tics.2016.07.002</a><span class="study-note">物理的な行動によって情報処理の要求を外部化し、認知負荷を減らす行動についての総説です。</span></li></ul></section>
+      </div>
+    </article>
+
+    <article class="feature inner" id="ai-chat">
+      <div class="feature-head"><span class="feature-no">08 / 09</span><h2>AI対話</h2></div>
+      <div class="feature-grid">
+        <section class="block"><h3>解決したい問題・設計</h3><p>このアプリのAI機能は色々ありますが、特筆するべきは対話機能でしょう。これは、AIとの対話を、なんとか見やすいマインドマップ形式として保存できないかを考えた結果生まれたものです。AIとの対話は、非常に長くなりがちで、閲覧性が低いです。しかし、見返したい価値のある情報が詰まっているものです。</p><p>それなら、対話機能ごとこのアプリに内蔵してしまえばいい。AIの返答をシームレスに階層化できる、理想的なツールです。そういう考えの元、この機能は誕生したのです。</p><div class="subsection"><h3>なぜ「対話をマップにする」のか</h3><p>チャットのログは時系列でしか読めません。しかし知識は時系列ではなく、構造で覚えるものです。同じ内容でも、縦に流れるログとして持つか、階層化されたマップとして持つかで、後から取り出せるかどうかが変わる───表現形式が認知を変えるという、多ビューと同じ原理がここでも働いています。</p></div></section>
+        <section class="block research"><h3>参考にした研究</h3><ul><li>Larkin, J. H., &amp; Simon, H. A. (1987). 前掲（多ビューの項を参照）。</li><li>Risko, E. F., &amp; Gilbert, S. J. (2016). 前掲（クイックメモの項を参照）。</li></ul></section>
+      </div>
+    </article>
+
+    <article class="feature inner" id="builder">
+      <div class="feature-head"><span class="feature-no">09 / 10</span><h2>空行分割・階層ビルダー</h2></div>
+      <div class="feature-grid">
+        <section class="block"><h3>解決したい問題</h3><p>まとまった文章をマインドマップへ移したいとき、最初から一つひとつノードを作るのは手間がかかります。しかし、文章をそのまま自動でマップに変換してしまうと、どこを親にして、何を子にするかという大切な判断まで機械に預けることになります。</p></section>
+        <section class="block"><h3>設計</h3><p>Miruでは、空行で区切られた文章をまず分割し、その後に階層ビルダーで構造を整えられます。機械が得意な、規則に沿った分割は機械に任せる。一方で、考えのまとまりや上下関係を決めるのは、書いた本人です。</p><p><strong>機械的な分割は機械に、構造の判断は人間に。</strong>これは、AIを思考の代替ではなく、考えるための有能な家臣として扱うMiruの考え方を、そのまま機能にしたものです。</p></section>
+        <section class="block research"><h3>この機能の出発点</h3><p>この機能は特定の論文からではなく、Miruの設計原則「AIは思考の代替ではない」から生まれました。手間は減らす。それでも、思考の骨格を決める主導権は手放さない。その境界を大切にしています。</p></section>
+      </div>
+    </article>
+
+    <article class="feature inner" id="stats">
+      <div class="feature-head"><span class="feature-no">10 / 10</span><h2>統計情報カード・実績</h2></div>
+      <div class="feature-grid">
+        <section class="block"><h3>解決したい問題</h3><p>学習でも思考でも、一番の壁は「続けること」です。そして人間は、積み重ねが見えないものを続けられません。</p></section>
+        <section class="block"><h3>設計</h3><p>これまでのあなたの記録を、統計情報カードとして表示できます。背景に流れるのは、星空と天の川のアニメーションです。ノードを作るほど星が増え、書いた文字が天の川になり、やり遂げたタスクが流れ星になる。自分の積み重ねは、眺めて美しいものであってほしいからです。カードはSNSで共有したり、画像として保存したりできます。</p><p>実績機能では、特定の条件を満たすと様々な称号を獲得でき、好きな称号をカードに表示できます。中には「石橋を叩き壊す超人」のような、割とコミカルな称号もあります。</p><p>私はもともと、ゲームの中に散りばめられた開発者の遊び心というものに、ずっと憧れていました。称号の名前が妙に面白いゲームが、あるのです。いつか自分でもやってみたかった。ただ、Miruは全体としては硬派な学習系アプリで、ふざけられる場面がほとんどありません。称号の名前は、このアプリの中で数少ない、ユーモアを光らせられる場所です。だから、思いっきり振り切りました。どうやったら取れるのかは、秘密です。楽しんでください。</p><p>称号の条件が小刻みに刻まれているのには理由があります。遠くの大きな目標より、手の届く小さな目標の連続の方が、やる気と自信を育てる───そして人は、「前進している」という感覚を得られたときに最もモチベーションが上がる。そういう研究の蓄積を踏まえた設計です。</p></section>
+        <section class="block research"><h3>参考にした研究</h3><ul><li>Bandura, A., &amp; Schunk, D. H. (1981). Cultivating competence, self-efficacy, and intrinsic interest through proximal self-motivation. <i>Journal of Personality and Social Psychology</i>, 41(3), 586–598. <a href="https://doi.org/10.1037/0022-3514.41.3.586" target="_blank" rel="noopener noreferrer">doi:10.1037/0022-3514.41.3.586</a><span class="study-note">近い小目標の連続の方が、達成・自己効力感・内発的興味を育てることを示した古典です。</span></li><li>Amabile, T. M., &amp; Kramer, S. J. (2011). The power of small wins. <i>Harvard Business Review</i>, 89(5), 70–80. <a href="https://hbr.org/2011/05/the-power-of-small-wins" target="_blank" rel="noopener noreferrer">記事を読む</a><span class="study-note">意味のある仕事で前進したと感じた日ほど意欲が高まる、という進捗の法則を扱います。</span></li><li>Kivetz, R., Urminsky, O., &amp; Zheng, Y. (2006). The goal-gradient hypothesis resurrected. <i>Journal of Marketing Research</i>, 43(1), 39–58. <a href="https://doi.org/10.1509/jmkr.43.1.39" target="_blank" rel="noopener noreferrer">doi:10.1509/jmkr.43.1.39</a><span class="study-note">ゴールに近づくほど努力が加速することを人間で実証した研究です。</span></li></ul></section>
+      </div>
+    </article>
+
+    <section class="finish inner">
+      <h2>考えを、見えるかたちに。</h2>
+      <p>機能の奥にある理由を知ったうえで、実際に使ってみてください。Miruは、あなたの思考を代わりにするためではなく、見えにくいものを一緒に見つけるための道具です。</p>
+      <a href="#" onclick="return false" aria-label="Google PlayでMiruを入手">
+        <div class="app-icon" aria-hidden="true">
+          <svg viewBox="0 0 108 108"><defs><linearGradient id="icon-base-end" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff6d00"/><stop offset="1" stop-color="#4527a0"/></linearGradient><radialGradient id="icon-cyan-end" cx=".85" cy=".15" r=".75"><stop offset="0" stop-color="#00e5ff" stop-opacity=".8"/><stop offset=".6" stop-color="#00e5ff" stop-opacity=".32"/><stop offset="1" stop-color="#00e5ff" stop-opacity="0"/></radialGradient><radialGradient id="icon-pink-end" cx=".15" cy=".85" r=".72"><stop offset="0" stop-color="#ff4081" stop-opacity=".8"/><stop offset=".6" stop-color="#ff4081" stop-opacity=".32"/><stop offset="1" stop-color="#ff4081" stop-opacity="0"/></radialGradient><clipPath id="icon-clip-end"><rect width="108" height="108" rx="25"/></clipPath></defs><g clip-path="url(#icon-clip-end)"><rect width="108" height="108" fill="url(#icon-base-end)"/><rect width="108" height="108" fill="url(#icon-cyan-end)"/><rect width="108" height="108" fill="url(#icon-pink-end)"/><path fill="#fff" d="M24.452 64V46.169h4.942l7.132 11.641h-2.598l6.928-11.641h4.942L45.849 64h-5.477l-.051-9.578h.866l-4.738 7.973H33.8l-4.942-7.973h1.07V64Zm24.122 0V50.067h5.757V64Zm2.879-15.054q-1.58 0-2.522-.841-.942-.84-.942-2.088 0-1.248.942-2.089.942-.84 2.522-.84 1.579 0 2.522.789.942.79.942 2.038 0 1.325-.942 2.178-.943.853-2.522.853ZM56.878 64V50.067h5.477v4.202l-.892-1.197q.637-1.63 2.038-2.445 1.401-.815 3.362-.815v5.095q-.382-.051-.675-.076-.293-.026-.599-.026-1.299 0-2.127.675-.828.675-.828 2.331V64Zm17.423.255q-1.656 0-2.993-.675-1.337-.675-2.101-2.114-.764-1.439-.764-3.707v-7.693H74.2v6.699q0 1.477.484 2.063.484.586 1.324.586.51 0 .955-.267.446-.268.726-.892.28-.624.28-1.643v-6.546h5.757V64H78.25v-4.025l1.095 1.096q-.739 1.63-2.101 2.407-1.363.777-2.943.777Z"/><path fill="#fff" d="m82 36 1.57 3.93L87 41l-3.43 1.07L82 46l-1.57-3.93L77 41l3.43-1.07Z"/></g></svg>
+        </div>
+      </a>
+    </section>
+
+    <footer><div class="inner foot"><div class="logo">Miru</div><nav class="foot-links"><a href="index.html">トップ</a><a href="index.html#story">ストーリー</a><a href="index.html#developer">開発者について</a><a href="mailto:miru.mindmap.support@gmail.com">お問い合わせ</a><a href="../legal/privacy.html">プライバシーポリシー</a><a href="../legal/terms.html">利用規約</a><a href="../legal/tokushouhou.html">特定商取引法に基づく表記</a></nav><p class="copyright">© 2026 Miru　個人開発</p></div></footer>
+  </main>
+
+  <script>
+    (function(){
+      var bar=document.getElementById('topbar');
+      var hideTimer;
+      function show(){clearTimeout(hideTimer);bar.classList.remove('hiding');bar.classList.add('show')}
+      function hide(){if(!bar.classList.contains('show'))return;bar.classList.remove('show');bar.classList.add('hiding');clearTimeout(hideTimer);hideTimer=setTimeout(function(){bar.classList.remove('hiding')},360)}
+      function onScroll(){if(window.scrollY>140)show();else hide()}
+      addEventListener('scroll',onScroll,{passive:true});onScroll();
+    })();
+    (function(){
+      var openButton=document.getElementById('menuOpen');
+      var menu=document.getElementById('siteMenu');
+      var closeTimer;
+      function closeMenu(){
+        if(!menu.classList.contains('open'))return;
+        menu.classList.remove('open');menu.classList.add('closing');openButton.setAttribute('aria-expanded','false');menu.setAttribute('aria-hidden','true');document.body.classList.remove('menu-open');
+        clearTimeout(closeTimer);closeTimer=setTimeout(function(){menu.classList.remove('closing')},390);
+      }
+      function openMenu(){
+        clearTimeout(closeTimer);menu.classList.remove('closing');menu.classList.add('open');openButton.setAttribute('aria-expanded','true');menu.setAttribute('aria-hidden','false');document.body.classList.add('menu-open');
+      }
+      openButton.addEventListener('click',function(){menu.classList.contains('open')?closeMenu():openMenu()});
+      menu.querySelectorAll('[data-menu-close],a').forEach(function(element){element.addEventListener('click',closeMenu)});
+      addEventListener('keydown',function(event){if(event.key==='Escape')closeMenu()});
+    })();
+  </script>
+</body>
+</html>
