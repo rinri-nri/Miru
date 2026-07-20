@@ -81,10 +81,12 @@ a{ color:inherit; }
 .menu-scrim{ position:absolute; inset:0; background:rgba(4,8,18,.5); backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px); }
 .menu-panel{ position:relative; width:min(420px,calc(100% - 28px)); height:100%; overflow:auto; padding:32px clamp(24px,5vw,42px) 44px;
   color:#edf0f8; background:linear-gradient(160deg,rgba(20,34,71,.97),rgba(15,21,42,.98) 55%,rgba(73,43,19,.97));
-  border-left:1px solid rgba(255,255,255,.14); box-shadow:-18px 0 50px rgba(0,0,0,.34); transform:translateX(104%); transition:transform .38s cubic-bezier(.2,.8,.2,1); }
+  border-left:1px solid rgba(255,255,255,.14); box-shadow:-18px 0 50px rgba(0,0,0,.34); transform:translateX(104%); transition:transform .38s cubic-bezier(.2,.8,.2,1);
+  -ms-overflow-style:none; scrollbar-width:none; }
+.menu-panel::-webkit-scrollbar{ width:0; height:0; }
 .menu-layer.open .menu-panel{ transform:translateX(0); }
 .menu-top{ display:flex; align-items:center; justify-content:space-between; margin-bottom:40px; }
-.menu-title{ margin:0; font-family:"Zen Antique Logo","Hiragino Mincho ProN","Yu Mincho",serif; font-size:1.3rem; letter-spacing:.08em; }
+.menu-title{ margin:0; font-family:inherit; font-size:1.3rem; font-weight:700; letter-spacing:.04em; }
 .menu-close{ width:36px; height:36px; border:1px solid rgba(255,255,255,.22); border-radius:50%; color:#eef1fb; background:rgba(255,255,255,.08); font-size:1.25rem; cursor:pointer; }
 .menu-group + .menu-group{ margin-top:31px; padding-top:27px; border-top:1px solid rgba(255,255,255,.13); }
 .menu-label{ margin:0 0 12px; color:#b8c4e2; font-size:.69rem; font-weight:700; letter-spacing:.16em; }
