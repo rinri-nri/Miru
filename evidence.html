@@ -245,9 +245,17 @@ footer .copy{ width:100%; font-size:.7rem; color:#586074; margin-top:8px; }
 }
 
 /* 本文は後で追加する。共通テンプレートはトップページのソースをそのまま保持する。 */
-body.evidence-draft .hero{visibility:hidden}
-body.evidence-draft .flow > .section,
+body.evidence-draft .hero,
+body.evidence-draft .flow > .section:not(.evidence-library),
 body.evidence-draft .flow > .close{display:none}
+.evidence-library{max-width:900px;padding-top:clamp(120px,18vh,180px)}
+.evidence-library h1{margin:0;color:var(--head);font-size:clamp(2rem,5vw,3.4rem);line-height:1.35}
+.evidence-lead{max-width:44em;color:#b9bfcd;line-height:2.1}
+.evidence-note{margin:32px 0 52px;padding:18px 20px;border-left:2px solid var(--gold);background:rgba(255,255,255,.035);color:#cbd0db;font-size:.88rem;line-height:1.9}
+.evidence-group{margin-top:46px}.evidence-group h2{margin:0 0 18px;color:var(--head);font-size:clamp(1.2rem,3vw,1.55rem)}
+.evidence-item{padding:22px 0;border-top:1px solid var(--line)}.evidence-item:last-child{border-bottom:1px solid var(--line)}
+.evidence-item p{margin:0}.evidence-citation{color:#e5e8ef;font-size:.93rem;line-height:1.9}.evidence-summary{margin-top:9px!important;color:var(--muted);font-size:.86rem;line-height:1.9}
+.evidence-item a{color:var(--gold);text-decoration:none}.evidence-item a:hover{text-decoration:underline}
 </style>
 </head>
 <body class="evidence-draft">
@@ -412,15 +420,45 @@ body.evidence-draft .flow > .close{display:none}
 </section>
 
 <!-- 締め -->
-<div class="close">
+  <div class="close">
   <h2>考えを、見えるかたちに。</h2>
   <p>マインドマップ × 認知科学 × AI。Android で無料ではじめられます。</p>
   <a class="close-app-link" href="#" onclick="return false" aria-label="Google PlayでMiruを入手">
     <img class="close-app-icon" alt="">
   </a>
-</div>
+  </div>
 
-<footer>
+  <section class="section evidence-library" id="evidence">
+    <p class="eyebrow">EVIDENCE LIBRARY</p>
+    <h1>設計の出発点を、<br>たどれるように。</h1>
+    <p class="evidence-lead">Miruの主要な機能は、思いつきだけで設計していません。ここでは参照した研究を、原典へのリンクとともに公開します。研究結果は機能の効果を保証するものではありませんが、設計判断の出発点として大切にしています。</p>
+    <p class="evidence-note">研究には対象者・条件・限界があります。ここでは論文の結論を必要以上に一般化せず、Miruのどの設計に着想を与えたかを記します。</p>
+
+    <div class="evidence-group"><h2>思い出す・繰り返す</h2>
+      <article class="evidence-item"><p class="evidence-citation">Roediger, H. L., &amp; Karpicke, J. D. (2006). <i>Psychological Science</i>, 17(3), 249–255. <a href="https://doi.org/10.1111/j.1467-9280.2006.01693.x" target="_blank" rel="noopener noreferrer">DOI</a></p><p class="evidence-summary">再読より想起テストの方が長期記憶を改善した代表的研究。アクティブリコールの出発点です。</p></article>
+      <article class="evidence-item"><p class="evidence-citation">Cepeda, N. J., et al. (2006). <i>Psychological Bulletin</i>, 132(3), 354–380. <a href="https://doi.org/10.1037/0033-2909.132.3.354" target="_blank" rel="noopener noreferrer">DOI</a></p><p class="evidence-summary">分散学習を統合したメタ分析。間隔を空けて再出題する問題集の根拠です。</p></article>
+      <article class="evidence-item"><p class="evidence-citation">Sharif, M. A., &amp; Shu, S. B. (2017). <i>Journal of Marketing Research</i>, 54(3), 495–509. <a href="https://doi.org/10.1509/jmr.15.0231" target="_blank" rel="noopener noreferrer">DOI</a></p><p class="evidence-summary">余裕（スラック）のある目標の方が継続されやすいことを扱う研究。かんたんモードの着想です。</p></article>
+    </div>
+
+    <div class="evidence-group"><h2>見方を変える・振り返る</h2>
+      <article class="evidence-item"><p class="evidence-citation">Lord, C. G., Lepper, M. R., &amp; Preston, E. (1984). <i>Journal of Personality and Social Psychology</i>, 47(6), 1231–1243. <a href="https://doi.org/10.1037/0022-3514.47.6.1231" target="_blank" rel="noopener noreferrer">DOI</a></p><p class="evidence-summary">反対側を具体的に考える戦略が判断の偏りを抑えることを示した研究。疑問・反論機能の参照元です。</p></article>
+      <article class="evidence-item"><p class="evidence-citation">Di Stefano, G., et al. (2014). <i>Learning by thinking</i>. <a href="https://doi.org/10.2139/ssrn.2414478" target="_blank" rel="noopener noreferrer">DOI</a></p><p class="evidence-summary">振り返りの時間が学習の進行を助ける可能性を扱うワーキングペーパー。日次・週次分析の着想です。</p></article>
+      <article class="evidence-item"><p class="evidence-citation">Larkin, J. H., &amp; Simon, H. A. (1987). <i>Cognitive Science</i>, 11(1), 65–100. <a href="https://doi.org/10.1111/j.1551-6708.1987.tb00863.x" target="_blank" rel="noopener noreferrer">DOI</a></p><p class="evidence-summary">同じ情報でも表現形式により探索・認識のしやすさが変わることを論じた研究。多ビューとAI対話のマップ化に通じます。</p></article>
+    </div>
+
+    <div class="evidence-group"><h2>集中を守る・外に出す</h2>
+      <article class="evidence-item"><p class="evidence-citation">Alvarsson, J. J., et al. (2010). <i>International Journal of Environmental Research and Public Health</i>, 7(3), 1036–1046. <a href="https://doi.org/10.3390/ijerph7031036" target="_blank" rel="noopener noreferrer">DOI</a></p><p class="evidence-summary">自然音と環境騒音におけるストレス回復を比較した研究。自然音機能の参照元です。</p></article>
+      <article class="evidence-item"><p class="evidence-citation">Ariga, A., &amp; Lleras, A. (2011). <i>Cognition</i>, 118(3), 439–443. <a href="https://doi.org/10.1016/j.cognition.2010.12.007" target="_blank" rel="noopener noreferrer">DOI</a></p><p class="evidence-summary">短い中断が連続作業での注意低下を防ぐ可能性を示した研究。ポモドーロタイマーの参照元です。</p></article>
+      <article class="evidence-item"><p class="evidence-citation">Risko, E. F., &amp; Gilbert, S. J. (2016). <i>Trends in Cognitive Sciences</i>, 20(9), 676–688. <a href="https://doi.org/10.1016/j.tics.2016.07.002" target="_blank" rel="noopener noreferrer">DOI</a></p><p class="evidence-summary">認知的オフロードの総説。すぐ記録して頭の負担を外へ出す、クイックメモの考え方です。</p></article>
+    </div>
+
+    <div class="evidence-group"><h2>積み重ねを見えるようにする</h2>
+      <article class="evidence-item"><p class="evidence-citation">Bandura, A., &amp; Schunk, D. H. (1981). <i>Journal of Personality and Social Psychology</i>, 41(3), 586–598. <a href="https://doi.org/10.1037/0022-3514.41.3.586" target="_blank" rel="noopener noreferrer">DOI</a></p><p class="evidence-summary">近い小目標が自己効力感と内発的興味に関わることを示した研究。実績の小刻みな設計に反映しています。</p></article>
+      <article class="evidence-item"><p class="evidence-citation">Kivetz, R., Urminsky, O., &amp; Zheng, Y. (2006). <i>Journal of Marketing Research</i>, 43(1), 39–58. <a href="https://doi.org/10.1509/jmkr.43.1.39" target="_blank" rel="noopener noreferrer">DOI</a></p><p class="evidence-summary">目標に近づくほど努力が加速するゴール勾配を扱う研究。進捗を可視化する実績カードの参照元です。</p></article>
+    </div>
+  </section>
+
+  <footer>
   <div class="foot-in">
     <div class="logo">Miru</div>
     <nav class="f">
