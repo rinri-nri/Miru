@@ -64,6 +64,9 @@ a{ color:inherit; }
   transition:opacity .38s ease, background .38s ease .22s, border-color .38s ease .22s, backdrop-filter .38s ease .22s, -webkit-backdrop-filter .38s ease .22s; }
 .topbar.show{ background:rgba(12,16,32,.56); border-bottom-color:rgba(255,255,255,.06);
   backdrop-filter:blur(18px) saturate(1.3); -webkit-backdrop-filter:blur(18px) saturate(1.3); opacity:1; pointer-events:auto; }
+.topbar.hiding{ background:rgba(12,16,32,0); border-bottom-color:rgba(255,255,255,0);
+  backdrop-filter:blur(0) saturate(1); -webkit-backdrop-filter:blur(0) saturate(1);
+  transition:background .38s ease, border-color .38s ease, backdrop-filter .38s ease, -webkit-backdrop-filter .38s ease; }
 .topbar .logo{ font-size:1.575rem; color:#fff; }
 .topbar .links{ display:flex; align-items:center; gap:clamp(14px,2vw,30px); }
 .topbar .links a{ font-size:.8rem; color:#dfe3ee; text-decoration:none; opacity:.85; transition:opacity .2s; }
@@ -344,10 +347,21 @@ footer .copy{ width:100%; font-size:.7rem; color:#586074; margin-top:8px; }
 (function(){
   var bar = document.getElementById('topbar');
   var hero = document.querySelector('.hero');
+  var hideTimer;
+  function showBar(){
+    clearTimeout(hideTimer);
+    bar.classList.remove('hiding');
+    bar.classList.add('show');
+  }
+  function hideBar(){
+    if(!bar.classList.contains('show') || bar.classList.contains('hiding')) return;
+    bar.classList.add('hiding');
+    hideTimer = setTimeout(function(){ bar.classList.remove('show','hiding'); }, 390);
+  }
   function onScroll(){
     var trigger = hero.offsetHeight - 70;
-    if(window.scrollY > trigger) bar.classList.add('show');
-    else bar.classList.remove('show');
+    if(window.scrollY > trigger) showBar();
+    else hideBar();
   }
   addEventListener('scroll', onScroll, {passive:true});
   addEventListener('resize', onScroll);
