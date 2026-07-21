@@ -706,14 +706,13 @@ footer .copy{ width:100%; font-size:.7rem; color:#586074; margin-top:8px; }
   var loader=document.getElementById('siteLoader'),bar=document.getElementById('loaderProgress'),percent=document.getElementById('loaderPercent');
   if(!loader||!bar||!percent)return;
   var reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var coarse=!matchMedia('(hover:hover) and (pointer:fine)').matches;
-  var minimal=reduced||coarse,started=Date.now(),finished=false,current=0,minDuration=760;
+  var started=Date.now(),finished=false,current=0,minDuration=700;
   function draw(value){current=Math.max(current,Math.min(100,Math.round(value)));bar.style.width=current+'%';percent.textContent=current+'%';}
   function remove(){loader.classList.add('is-ready');document.body.classList.remove('loading');setTimeout(function(){loader.remove()},500)}
-  function complete(){if(finished)return;finished=true;draw(100);setTimeout(remove,minimal?0:150)}
+  function complete(){if(finished)return;finished=true;draw(100);setTimeout(remove,reduced?0:150)}
   function tick(){if(finished)return;var elapsed=Date.now()-started;draw(Math.min(92,elapsed/8.2));requestAnimationFrame(tick)}
-  function ready(){var remain=Math.max(0,minDuration-(Date.now()-started));setTimeout(complete,minimal?0:remain)}
-  if(minimal){ready()}else{draw(0);requestAnimationFrame(tick);if(document.readyState==='complete')ready();else addEventListener('load',ready,{once:true});}
+  function ready(){var remain=Math.max(0,minDuration-(Date.now()-started));setTimeout(complete,reduced?0:remain)}
+  if(reduced){draw(100);ready()}else{draw(0);requestAnimationFrame(tick);if(document.readyState==='complete')ready();else addEventListener('load',ready,{once:true});}
 })();
 </script>
 </body>
